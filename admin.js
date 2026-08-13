@@ -1,781 +1,550 @@
-const API = window.TW_CONFIG?.API_BASE_URL || "";
+document.addEventListener("DOMContentLoaded",()=>{
+  const loginForm=$("loginForm"),dashboard=$("adminDashboard");
 
-function $(id) {
-  return document.getElementById(id);
-}
+  if(loginForm){
+    loginForm.addEventListener("submit",async e=>{
+      e.preventDefault();
 
+      const btn=loginForm.querySelector("button");
+      btn.disabled=true;
 
-/* =========================================
-   AUTH
-========================================= */
+      try{
+        const d=await api("/auth/login",{
+          method:"POST",
+          body:JSON.stringify({
+            email:$("email").value.trim().toLowerCase(),
+            password:$("password").value
+          })
+        });
 
-function getToken() {
-  return (
-    localStorage.getItem("token") ||
-    localStorage.getItem("tw_token") ||
-    ""
-  );
-}
-
-
-function authHeaders() {
-
-  const token = getToken();
-
-  return {
-    "Content-Type": "application/json",
-
-    ...(token
-      ? {
-          Authorization: `Bearer ${token}`
+        if(d.user?.role!=="admin"){
+          throw new Error(
+            "This account does not have administrator access."
+          );
         }
-      : {})
-  };
+
+        localStorage.setItem("token",d.token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify(d.user)
+        );
+
+        location.href="./admin.html";
+
+      }catch(x){
+        showMessage(
+          $("msg"),
+          x.message,
+          "error"
+        );
+
+        btn.disabled=false;
+      }
+    });
+
+    return;
+  }
+
+  if(dashboard&&!requireAuth())return;
+
+  if(
+    dashboard &&
+    currentUser()?.role!=="admin"
+  ){
+    dashboard.innerHTML=
+      '<div class="admin-card error">Administrator access required.</div>';
+
+    return;
+  }
+
+  loadAdmin();
+});
+
+
+async function loadAdmin(){
+
+  try{
+
+    const [
+      stats,
+      events,
+      free,
+      support,
+      venues
+    ]=await Promise.all([
+
+      api("/admin/stats"),
+
+      api("/events"),
+
+      api("/admin/free-ticket-options"),
+
+      api("/admin/support"),
+
+      api("/admin/venues")
+
+    ]);
+
+
+    $("stats").innerHTML=
+      Object.entries(
+        stats.stats||{}
+      )
+      .map(
+        ([k,v])=>
+          `<div class="stat">
+            <b>${esc(v)}</b>
+            <span>${esc(k)}</span>
+          </div>`
+      )
+      .join("");
+
+
+    $("eventList").innerHTML=
+      (events.events||[])
+      .map(
+        e=>
+          `<div class="admin-row">
+
+            <b>${esc(e.title)}</b>
+
+            <br>
+
+            ${esc(e.date)}
+            ·
+            ${esc(e.venue)},
+            ${esc(e.city||"")}
+
+            <br>
+
+            <span>
+              ${Number(e.availableSeats||0)}
+              available
+            </span>
+
+          </div>`
+      )
+      .join("")
+      ||
+      "<p>No events.</p>";
+
+
+    $("freeTicket").innerHTML=
+      (free.options||[])
+      .map(
+        x=>
+          `<option value="${esc(x.id)}">
+            ${esc(x.label)}
+          </option>`
+      )
+      .join("")
+      ||
+      "<option value=''>No available seats</option>";
+
+
+    $("supportList").innerHTML=
+      (support.messages||[])
+      .map(
+        x=>
+          `<div class="admin-row">
+
+            <b>${esc(x.subject)}</b>
+
+            <br>
+
+            ${esc(x.email)}
+
+            <br>
+
+            ${esc(x.message)}
+
+            <br>
+
+            <small>
+              ${esc(x.status||"open")}
+            </small>
+
+          </div>`
+      )
+      .join("")
+      ||
+      "<p>No support messages.</p>";
+
+
+    $("venueId").innerHTML=
+      '<option value="">Select a saved venue…</option>'+
+      (venues.venues||[])
+      .map(
+        v=>
+          `<option value="${esc(v.id)}">
+            ${esc(v.name)}
+            —
+            ${esc(v.city)},
+            ${esc(v.country)}
+            (${Number(v.seatCount||0)} seats)
+          </option>`
+      )
+      .join("");
+
+
+  }catch(e){
+
+    showMessage(
+      $("adminMsg"),
+      e.message,
+      "error"
+    );
+
+  }
 }
 
 
-/* =========================================
-   MESSAGE
-========================================= */
+async function parseSeatData(file){
 
-function message(element, text, success = false) {
+  const text=await file.text();
 
-  if (!element) return;
+  if(
+    file.name
+      .toLowerCase()
+      .endsWith(".json")
+  ){
 
-  element.textContent = text;
+    const parsed=JSON.parse(text);
 
-  element.style.color = success
-    ? "#16803c"
-    : "#d93025";
-}
+    const rows=
+      Array.isArray(parsed)
+        ? parsed
+        : (parsed.seats||[]);
 
+    if(!rows.length){
 
-/* =========================================
-   MANUAL TICKET BUILDER
-========================================= */
+      throw new Error(
+        "The JSON seat map contains no seats."
+      );
 
-let ticketNumber = 0;
+    }
 
-
-function createTicketCard() {
-
-  ticketNumber++;
-
-  const card = document.createElement("div");
-
-  card.className = "ticket-card";
-
-  card.dataset.ticket = ticketNumber;
+    return rows;
+  }
 
 
-  card.innerHTML = `
-
-    <div class="ticket-card-header">
-
-      <h4>
-        Ticket ${ticketNumber}
-      </h4>
-
-      ${
-        ticketNumber > 1
-          ? `
-            <button
-              type="button"
-              class="remove-ticket"
-            >
-              Remove
-            </button>
-          `
-          : ""
-      }
-
-    </div>
+  const lines=
+    text
+      .split(/\r?\n/)
+      .filter(Boolean);
 
 
-    <div class="ticket-fields">
+  if(lines.length<2){
 
-      <div>
-
-        <label>
-          Section
-        </label>
-
-        <input
-          type="text"
-          class="ticket-section"
-          placeholder="Example: 110"
-          required
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          Row
-        </label>
-
-        <input
-          type="text"
-          class="ticket-row"
-          placeholder="Example: 23"
-          required
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          Seat
-        </label>
-
-        <input
-          type="text"
-          class="ticket-seat"
-          placeholder="Example: 24"
-          required
-        >
-
-      </div>
-
-
-      <div>
-
-        <label>
-          Price
-        </label>
-
-        <input
-          type="number"
-          class="ticket-price"
-          min="0"
-          step="0.01"
-          placeholder="Example: 25000"
-          required
-        >
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  const removeButton =
-    card.querySelector(".remove-ticket");
-
-
-  if (removeButton) {
-
-    removeButton.addEventListener(
-      "click",
-      () => {
-
-        card.remove();
-
-        renumberTickets();
-
-      }
+    throw new Error(
+      "The CSV seat map is empty."
     );
 
   }
 
 
-  $("ticketList").appendChild(card);
+  const headers=
+    lines
+      .shift()
+      .split(",")
+      .map(
+        x=>x.trim().toLowerCase()
+      );
+
+
+  return lines.map(line=>{
+
+    const cols=line.split(",");
+    const o={};
+
+    headers.forEach(
+      (h,i)=>{
+        o[h]=(cols[i]||"").trim();
+
+        if(o.price!==undefined){
+          o.price=Number(o.price);
+        }
+      }
+    );
+
+    return o;
+
+  });
 
 }
 
 
-function renumberTickets() {
+$("venueForm")?.addEventListener(
+  "submit",
+  async e=>{
 
-  const cards =
-    document.querySelectorAll(
-      ".ticket-card"
-    );
+    e.preventDefault();
+
+    const b=
+      e.currentTarget.querySelector(
+        "button"
+      );
+
+    b.disabled=true;
+
+    try{
+
+      const mapFile=
+        $("venueMapFile").files[0];
+
+      const dataFile=
+        $("seatDataFile").files[0];
 
 
-  cards.forEach(
-    (card, index) => {
+      if(!mapFile||!dataFile){
 
-      const number = index + 1;
-
-      card.dataset.ticket = number;
-
-      const heading =
-        card.querySelector("h4");
-
-      if (heading) {
-
-        heading.textContent =
-          `Ticket ${number}`;
+        throw new Error(
+          "Upload both the seat map image and seat-data file."
+        );
 
       }
+
+
+      const seats=
+        await parseSeatData(
+          dataFile
+        );
+
+
+      const fd=
+        new FormData();
+
+
+      fd.append(
+        "name",
+        $("venueName").value.trim()
+      );
+
+      fd.append(
+        "city",
+        $("venueCity").value.trim()
+      );
+
+      fd.append(
+        "country",
+        $("venueCountry").value.trim()
+      );
+
+      fd.append(
+        "address",
+        $("venueAddress").value.trim()
+      );
+
+      fd.append(
+        "seatMapImage",
+        mapFile
+      );
+
+      fd.append(
+        "seatData",
+        JSON.stringify(seats)
+      );
+
+
+      const d=
+        await apiForm(
+          "/admin/venues",
+          fd
+        );
+
+
+      showMessage(
+        $("venueMsg"),
+        d.message||
+        "Venue saved and seat map imported.",
+        "success"
+      );
+
+
+      e.currentTarget.reset();
+
+      await loadAdmin();
+
+
+    }catch(x){
+
+      showMessage(
+        $("venueMsg"),
+        x.message,
+        "error"
+      );
+
+    }finally{
+
+      b.disabled=false;
 
     }
-  );
-
-
-  ticketNumber = cards.length;
-
-}
-
-
-/* =========================================
-   ADD TICKET
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    createTicketCard();
-
-
-    $("addTicketBtn")?.addEventListener(
-      "click",
-      () => {
-
-        createTicketCard();
-
-      }
-    );
 
   }
 );
 
-
-/* =========================================
-   GET MANUAL TICKETS
-========================================= */
-
-function getManualTickets() {
-
-  const cards =
-    document.querySelectorAll(
-      ".ticket-card"
-    );
-
-
-  return Array.from(cards).map(
-    card => ({
-
-      section:
-        card
-          .querySelector(".ticket-section")
-          .value
-          .trim(),
-
-      row:
-        card
-          .querySelector(".ticket-row")
-          .value
-          .trim(),
-
-      seat:
-        card
-          .querySelector(".ticket-seat")
-          .value
-          .trim(),
-
-      price:
-        Number(
-          card
-            .querySelector(".ticket-price")
-            .value
-        ),
-
-      currency:
-        $("currency").value
-          .trim()
-          .toUpperCase(),
-
-      status:
-        "available"
-
-    })
-  );
-
-}
-
-
-/* =========================================
-   CREATE EVENT
-========================================= */
 
 $("eventForm")?.addEventListener(
   "submit",
-  async event => {
+  async e=>{
 
-    event.preventDefault();
+    e.preventDefault();
 
-
-    const eventMsg =
-      $("eventMsg");
-
-
-    const tickets =
-      getManualTickets();
-
-
-    if (!tickets.length) {
-
-      message(
-        eventMsg,
-        "Please add at least one ticket."
+    const b=
+      e.currentTarget.querySelector(
+        "button"
       );
 
-      return;
+    b.disabled=true;
 
-    }
+    try{
 
-
-    try {
-
-      message(
-        eventMsg,
-        "Creating event..."
-      );
-
-
-      const payload = {
-
-        title:
-          $("title").value.trim(),
-
-        artist:
-          $("artist").value.trim(),
-
-        date:
-          $("date").value,
-
-        time:
-          $("time").value,
-
-        venue:
-          $("venue").value.trim(),
-
-        city:
-          $("city").value.trim(),
-
-        country:
-          $("country").value.trim(),
-
-        currency:
-          $("currency").value
-            .trim()
-            .toUpperCase(),
-
-        image:
-          $("image").value.trim(),
-
-        description:
-          $("description").value.trim(),
-
-        tickets
-
-      };
-
-
-      const response =
-        await fetch(
-          `${API}/api/admin/events`,
+      const d=
+        await api(
+          "/admin/events",
           {
-            method: "POST",
+            method:"POST",
 
-            headers:
-              authHeaders(),
+            body:JSON.stringify({
 
-            body:
-              JSON.stringify(payload)
+              venueId:
+                Number(
+                  $("venueId").value
+                ),
+
+              title:
+                $("title")
+                  .value
+                  .trim(),
+
+              artist:
+                $("artist")
+                  .value
+                  .trim(),
+
+              date:
+                $("date").value,
+
+              time:
+                $("time").value,
+
+              currency:
+                $("currency")
+                  .value
+                  .trim()
+                  .toUpperCase(),
+
+              image:
+                $("image")
+                  .value
+                  .trim(),
+
+              description:
+                $("description")
+                  .value
+                  .trim()
+
+            })
           }
         );
 
 
-      const data =
-        await response.json();
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          data.message ||
-          "Could not create event."
-        );
-
-      }
-
-
-      message(
-        eventMsg,
-        "Event created successfully!",
-        true
+      showMessage(
+        $("eventMsg"),
+        d.message||
+        "Event created successfully using the venue seat map.",
+        "success"
       );
 
 
-      $("eventForm").reset();
+      e.currentTarget.reset();
+
+      $("currency").value="NGN";
+
+      await loadAdmin();
 
 
-      $("currency").value =
-        "NGN";
+    }catch(x){
 
-
-      $("ticketList").innerHTML =
-        "";
-
-
-      ticketNumber = 0;
-
-
-      createTicketCard();
-
-
-      loadEvents();
-
-    }
-
-    catch (error) {
-
-      console.error(error);
-
-      message(
-        eventMsg,
-        error.message ||
-        "Server error."
+      showMessage(
+        $("eventMsg"),
+        x.message,
+        "error"
       );
+
+    }finally{
+
+      b.disabled=false;
 
     }
 
   }
 );
 
-
-/* =========================================
-   ADMIN GIVEAWAY
-========================================= */
 
 $("freeForm")?.addEventListener(
   "submit",
-  async event => {
+  async e=>{
 
-    event.preventDefault();
+    e.preventDefault();
 
-
-    const msg =
-      $("freeMsg");
-
-
-    try {
-
-      message(
-        msg,
-        "Giving away ticket..."
+    const b=
+      e.currentTarget.querySelector(
+        "button"
       );
 
+    b.disabled=true;
 
-      const payload = {
+    try{
 
-        userEmail:
-          $("freeEmail")
-            .value
-            .trim()
-            .toLowerCase(),
-
-        ticketId:
-          Number(
-            $("freeTicket").value
-          ),
-
-        /*
-          IMPORTANT:
-          Admin giveaway = NO EMAIL
-        */
-
-        sendEmail:
-          false,
-
-        reason:
-          "admin_giveaway"
-
-      };
-
-
-      const response =
-        await fetch(
-          `${API}/api/admin/free-ticket`,
+      const d=
+        await api(
+          "/admin/free-ticket",
           {
-            method: "POST",
+            method:"POST",
 
-            headers:
-              authHeaders(),
+            body:JSON.stringify({
 
-            body:
-              JSON.stringify(payload)
+              userEmail:
+                $("freeEmail")
+                  .value
+                  .trim()
+                  .toLowerCase(),
+
+              ticketId:
+                Number(
+                  $("freeTicket").value
+                )
+
+            })
           }
         );
 
 
-      const data =
-        await response.json();
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          data.message ||
-          "Could not give away ticket."
-        );
-
-      }
-
-
-      message(
-        msg,
-        "Ticket given away successfully. No email was sent.",
-        true
+      showMessage(
+        $("freeMsg"),
+        d.message||
+        "Free ticket issued.",
+        "success"
       );
 
 
-      $("freeForm").reset();
+      await loadAdmin();
 
 
-      loadAvailableTickets();
+    }catch(x){
+
+      showMessage(
+        $("freeMsg"),
+        x.message,
+        "error"
+      );
+
+    }finally{
+
+      b.disabled=false;
 
     }
-
-    catch (error) {
-
-      console.error(error);
-
-      message(
-        msg,
-        error.message ||
-        "Server error."
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   LOAD EVENTS
-========================================= */
-
-async function loadEvents() {
-
-  const list =
-    $("eventList");
-
-  if (!list) return;
-
-
-  try {
-
-    const response =
-      await fetch(
-        `${API}/api/events`
-      );
-
-
-    const data =
-      await response.json();
-
-
-    const events =
-      data.events ||
-      data.data ||
-      data ||
-      [];
-
-
-    if (!Array.isArray(events) ||
-        !events.length) {
-
-      list.innerHTML =
-        "<p>No events found.</p>";
-
-      return;
-
-    }
-
-
-    list.innerHTML =
-      events.map(
-        event => `
-
-          <div class="event-row">
-
-            <strong>
-              ${escapeHtml(
-                event.title || "Event"
-              )}
-            </strong>
-
-            <span>
-              ${escapeHtml(
-                event.artist || ""
-              )}
-            </span>
-
-            <span>
-              ${escapeHtml(
-                event.date || ""
-              )}
-            </span>
-
-          </div>
-
-        `
-      ).join("");
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    list.innerHTML =
-      "<p>Unable to load events.</p>";
-
-  }
-
-}
-
-
-/* =========================================
-   LOAD AVAILABLE TICKETS
-========================================= */
-
-async function loadAvailableTickets() {
-
-  const select =
-    $("freeTicket");
-
-  if (!select) return;
-
-
-  try {
-
-    select.innerHTML =
-      `
-        <option value="">
-          Loading available tickets…
-        </option>
-      `;
-
-
-    const response =
-      await fetch(
-        `${API}/api/admin/available-tickets`,
-        {
-          headers:
-            authHeaders()
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        data.message ||
-        "Could not load tickets."
-      );
-
-    }
-
-
-    const tickets =
-      data.tickets ||
-      data.data ||
-      [];
-
-
-    select.innerHTML =
-      `
-        <option value="">
-          Select ticket…
-        </option>
-      `;
-
-
-    tickets.forEach(
-      ticket => {
-
-        const option =
-          document.createElement(
-            "option"
-          );
-
-
-        option.value =
-          ticket.id;
-
-
-        option.textContent =
-          `${ticket.event_title || ticket.title} — Section ${ticket.section} — Row ${ticket.row_name} — Seat ${ticket.seat} — ${ticket.price} ${ticket.currency}`;
-
-
-        select.appendChild(
-          option
-        );
-
-      }
-    );
-
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    select.innerHTML =
-      `
-        <option value="">
-          Unable to load tickets
-        </option>
-      `;
-
-  }
-
-}
-
-
-/* =========================================
-   HTML ESCAPE
-========================================= */
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================================
-   START
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    loadEvents();
-
-    loadAvailableTickets();
 
   }
 );
