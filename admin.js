@@ -1,59 +1,57 @@
-document.addEventListener("DOMContentLoaded",()=>{
-  const loginForm=$("loginForm"),dashboard=$("adminDashboard");
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = $("loginForm");
+  const dashboard = $("adminDashboard");
 
-  if(loginForm){
-    loginForm.addEventListener("submit",async e=>{
+  // =========================
+  // ADMIN LOGIN
+  // =========================
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const btn=loginForm.querySelector("button");
-      btn.disabled=true;
+      const btn = loginForm.querySelector("button");
+      btn.disabled = true;
 
-      try{
-        const d=await api("/auth/login",{
-          method:"POST",
-          body:JSON.stringify({
-            email:$("email").value.trim().toLowerCase(),
-            password:$("password").value
+      try {
+        const d = await api("/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            email: $("email").value.trim().toLowerCase(),
+            password: $("password").value
           })
         });
 
-        if(d.user?.role!=="admin"){
+        if (d.user?.role !== "admin") {
           throw new Error(
             "This account does not have administrator access."
           );
         }
 
-        localStorage.setItem("token",d.token);
-        localStorage.setItem(
-          "user",
-          JSON.stringify(d.user)
-        );
+        localStorage.setItem("token", d.token);
+        localStorage.setItem("user", JSON.stringify(d.user));
 
-        location.href="./admin.html";
+        location.href = "./admin.html";
 
-      }catch(x){
-        showMessage(
-          $("msg"),
-          x.message,
-          "error"
-        );
-
-        btn.disabled=false;
+      } catch (err) {
+        showMessage($("msg"), err.message, "error");
+        btn.disabled = false;
       }
     });
 
     return;
   }
 
-  if(dashboard&&!requireAuth())return;
+  // =========================
+  // ADMIN DASHBOARD
+  // =========================
+  if (dashboard && !requireAuth()) return;
 
-  if(
+  if (
     dashboard &&
-    currentUser()?.role!=="admin"
-  ){
-    dashboard.innerHTML=
+    currentUser()?.role !== "admin"
+  ) {
+    dashboard.innerHTML =
       '<div class="admin-card error">Administrator access required.</div>';
-
     return;
   }
 
@@ -61,490 +59,479 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 
-async function loadAdmin(){
-
-  try{
-
-    const [
-      stats,
-      events,
-      free,
-      support,
-      venues
-    ]=await Promise.all([
-
+// =========================
+// LOAD ADMIN DATA
+// =========================
+async function loadAdmin() {
+  try {
+    const [stats, events, free, support] = await Promise.all([
       api("/admin/stats"),
-
       api("/events"),
-
       api("/admin/free-ticket-options"),
-
-      api("/admin/support"),
-
-      api("/admin/venues")
-
+      api("/admin/support")
     ]);
 
+    // Stats
+    if ($("stats")) {
+      $("stats").innerHTML =
+        Object.entries(stats.stats || {})
+          .map(
+            ([key, value]) =>
+              `<div class="stat">
+                <b>${esc(value)}</b>
+                <span>${esc(key)}</span>
+              </div>`
+          )
+          .join("");
+    }
 
-    $("stats").innerHTML=
-      Object.entries(
-        stats.stats||{}
-      )
-      .map(
-        ([k,v])=>
-          `<div class="stat">
-            <b>${esc(v)}</b>
-            <span>${esc(k)}</span>
-          </div>`
-      )
-      .join("");
+    // Events
+    if ($("eventList")) {
+      $("eventList").innerHTML =
+        (events.events || [])
+          .map(
+            (event) =>
+              `<div class="admin-row">
+                <b>${esc(event.title)}</b><br>
+                ${esc(event.date)} ·
+                ${esc(event.venue || "")},
+                ${esc(event.city || "")}<br>
+                <span>
+                  ${Number(event.availableSeats || 0)}
+                  available
+                </span>
+              </div>`
+          )
+          .join("") || "<p>No events.</p>";
+    }
 
+    // Giveaway tickets
+    if ($("freeTicket")) {
+      $("freeTicket").innerHTML =
+        (free.options || [])
+          .map(
+            (ticket) =>
+              `<option value="${esc(ticket.id)}">
+                ${esc(ticket.label)}
+              </option>`
+          )
+          .join("") ||
+        "<option value=''>No available seats</option>";
+    }
 
-    $("eventList").innerHTML=
-      (events.events||[])
-      .map(
-        e=>
-          `<div class="admin-row">
+    // Support
+    if ($("supportList")) {
+      $("supportList").innerHTML =
+        (support.messages || [])
+          .map(
+            (message) =>
+              `<div class="admin-row">
+                <b>${esc(message.subject)}</b><br>
+                ${esc(message.email)}<br>
+                ${esc(message.message)}<br>
+                <small>${esc(message.status || "open")}</small>
+              </div>`
+          )
+          .join("") || "<p>No support messages.</p>";
+    }
 
-            <b>${esc(e.title)}</b>
-
-            <br>
-
-            ${esc(e.date)}
-            ·
-            ${esc(e.venue)},
-            ${esc(e.city||"")}
-
-            <br>
-
-            <span>
-              ${Number(e.availableSeats||0)}
-              available
-            </span>
-
-          </div>`
-      )
-      .join("")
-      ||
-      "<p>No events.</p>";
-
-
-    $("freeTicket").innerHTML=
-      (free.options||[])
-      .map(
-        x=>
-          `<option value="${esc(x.id)}">
-            ${esc(x.label)}
-          </option>`
-      )
-      .join("")
-      ||
-      "<option value=''>No available seats</option>";
-
-
-    $("supportList").innerHTML=
-      (support.messages||[])
-      .map(
-        x=>
-          `<div class="admin-row">
-
-            <b>${esc(x.subject)}</b>
-
-            <br>
-
-            ${esc(x.email)}
-
-            <br>
-
-            ${esc(x.message)}
-
-            <br>
-
-            <small>
-              ${esc(x.status||"open")}
-            </small>
-
-          </div>`
-      )
-      .join("")
-      ||
-      "<p>No support messages.</p>";
-
-
-    $("venueId").innerHTML=
-      '<option value="">Select a saved venue…</option>'+
-      (venues.venues||[])
-      .map(
-        v=>
-          `<option value="${esc(v.id)}">
-            ${esc(v.name)}
-            —
-            ${esc(v.city)},
-            ${esc(v.country)}
-            (${Number(v.seatCount||0)} seats)
-          </option>`
-      )
-      .join("");
-
-
-  }catch(e){
-
+  } catch (err) {
     showMessage(
       $("adminMsg"),
-      e.message,
+      err.message,
       "error"
     );
-
   }
 }
 
 
-async function parseSeatData(file){
+// =========================
+// MANUAL TICKET SYSTEM
+// =========================
 
-  const text=await file.text();
-
-  if(
-    file.name
-      .toLowerCase()
-      .endsWith(".json")
-  ){
-
-    const parsed=JSON.parse(text);
-
-    const rows=
-      Array.isArray(parsed)
-        ? parsed
-        : (parsed.seats||[]);
-
-    if(!rows.length){
-
-      throw new Error(
-        "The JSON seat map contains no seats."
-      );
-
-    }
-
-    return rows;
-  }
+let manualTickets = [];
 
 
-  const lines=
-    text
-      .split(/\r?\n/)
-      .filter(Boolean);
+// Create the ticket input area
+function renderManualTickets() {
+  const container = $("ticketRows");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  manualTickets.forEach((ticket, index) => {
+    const row = document.createElement("div");
+
+    row.className = "ticket-row";
+
+    row.innerHTML = `
+      <div class="ticket-row-header">
+        <strong>Ticket ${index + 1}</strong>
+
+        <button
+          type="button"
+          class="remove-ticket"
+          onclick="removeTicket(${index})"
+        >
+          Remove
+        </button>
+      </div>
+
+      <div class="ticket-fields">
+
+        <div class="field">
+          <label>Section</label>
+          <input
+            type="text"
+            class="ticket-section"
+            data-index="${index}"
+            value="${esc(ticket.section)}"
+            placeholder="e.g. 110"
+          >
+        </div>
+
+        <div class="field">
+          <label>Row</label>
+          <input
+            type="text"
+            class="ticket-row-input"
+            data-index="${index}"
+            value="${esc(ticket.row)}"
+            placeholder="e.g. 24"
+          >
+        </div>
+
+        <div class="field">
+          <label>Seat</label>
+          <input
+            type="text"
+            class="ticket-seat"
+            data-index="${index}"
+            value="${esc(ticket.seat)}"
+            placeholder="e.g. 14"
+          >
+        </div>
+
+        <div class="field">
+          <label>Price</label>
+          <input
+            type="number"
+            class="ticket-price"
+            data-index="${index}"
+            value="${esc(ticket.price)}"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          >
+        </div>
+
+      </div>
+    `;
+
+    container.appendChild(row);
+  });
+}
 
 
-  if(lines.length<2){
+// =========================
+// ADD TICKET
+// =========================
+function addTicket() {
 
-    throw new Error(
-      "The CSV seat map is empty."
-    );
-
-  }
-
-
-  const headers=
-    lines
-      .shift()
-      .split(",")
-      .map(
-        x=>x.trim().toLowerCase()
-      );
-
-
-  return lines.map(line=>{
-
-    const cols=line.split(",");
-    const o={};
-
-    headers.forEach(
-      (h,i)=>{
-        o[h]=(cols[i]||"").trim();
-
-        if(o.price!==undefined){
-          o.price=Number(o.price);
-        }
-      }
-    );
-
-    return o;
-
+  manualTickets.push({
+    section: "",
+    row: "",
+    seat: "",
+    price: ""
   });
 
+  renderManualTickets();
+
+  // Scroll to new ticket
+  setTimeout(() => {
+    const rows = document.querySelectorAll(".ticket-row");
+
+    if (rows.length) {
+      rows[rows.length - 1].scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+  }, 50);
 }
 
 
-$("venueForm")?.addEventListener(
+// =========================
+// REMOVE TICKET
+// =========================
+function removeTicket(index) {
+
+  manualTickets.splice(index, 1);
+
+  renderManualTickets();
+}
+
+
+// =========================
+// READ CURRENT TICKETS
+// =========================
+function collectTickets() {
+
+  const sections =
+    document.querySelectorAll(".ticket-section");
+
+  const rows =
+    document.querySelectorAll(".ticket-row-input");
+
+  const seats =
+    document.querySelectorAll(".ticket-seat");
+
+  const prices =
+    document.querySelectorAll(".ticket-price");
+
+  const tickets = [];
+
+  for (let i = 0; i < manualTickets.length; i++) {
+
+    const section =
+      sections[i]?.value.trim() || "";
+
+    const row =
+      rows[i]?.value.trim() || "";
+
+    const seat =
+      seats[i]?.value.trim() || "";
+
+    const price =
+      prices[i]?.value.trim() || "";
+
+    if (!section || !row || !seat || !price) {
+      throw new Error(
+        `Please complete Ticket ${i + 1}: Section, Row, Seat and Price.`
+      );
+    }
+
+    const numericPrice = Number(price);
+
+    if (
+      !Number.isFinite(numericPrice) ||
+      numericPrice < 0
+    ) {
+      throw new Error(
+        `Invalid price for Ticket ${i + 1}.`
+      );
+    }
+
+    tickets.push({
+      section,
+      row,
+      seat,
+      price: numericPrice
+    });
+  }
+
+  if (!tickets.length) {
+    throw new Error(
+      "Please add at least one ticket."
+    );
+  }
+
+  return tickets;
+}
+
+
+// =========================
+// CREATE EVENT
+// =========================
+$("eventForm")?.addEventListener(
   "submit",
-  async e=>{
+  async (e) => {
 
     e.preventDefault();
 
-    const b=
-      e.currentTarget.querySelector(
-        "button"
-      );
+    const button =
+      e.currentTarget.querySelector("button[type='submit']");
 
-    b.disabled=true;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Creating Event...";
+    }
 
-    try{
+    try {
 
-      const mapFile=
-        $("venueMapFile").files[0];
+      const tickets = collectTickets();
 
-      const dataFile=
-        $("seatDataFile").files[0];
+      const eventData = {
+        title: $("title")?.value.trim() || "",
+        artist: $("artist")?.value.trim() || "",
+        date: $("date")?.value || "",
+        time: $("time")?.value || "",
+        currency:
+          $("currency")?.value.trim().toUpperCase() || "NGN",
+        image: $("image")?.value.trim() || "",
+        description:
+          $("description")?.value.trim() || "",
+
+        // MANUAL TICKETS
+        tickets: tickets
+      };
 
 
-      if(!mapFile||!dataFile){
+      if (!eventData.title) {
+        throw new Error("Please enter the event title.");
+      }
 
-        throw new Error(
-          "Upload both the seat map image and seat-data file."
-        );
+      if (!eventData.date) {
+        throw new Error("Please select the event date.");
+      }
 
+      if (!eventData.time) {
+        throw new Error("Please select the event time.");
       }
 
 
-      const seats=
-        await parseSeatData(
-          dataFile
-        );
+      const response = await api(
+        "/admin/events",
+        {
+          method: "POST",
 
-
-      const fd=
-        new FormData();
-
-
-      fd.append(
-        "name",
-        $("venueName").value.trim()
+          body: JSON.stringify(eventData)
+        }
       );
-
-      fd.append(
-        "city",
-        $("venueCity").value.trim()
-      );
-
-      fd.append(
-        "country",
-        $("venueCountry").value.trim()
-      );
-
-      fd.append(
-        "address",
-        $("venueAddress").value.trim()
-      );
-
-      fd.append(
-        "seatMapImage",
-        mapFile
-      );
-
-      fd.append(
-        "seatData",
-        JSON.stringify(seats)
-      );
-
-
-      const d=
-        await apiForm(
-          "/admin/venues",
-          fd
-        );
-
-
-      showMessage(
-        $("venueMsg"),
-        d.message||
-        "Venue saved and seat map imported.",
-        "success"
-      );
-
-
-      e.currentTarget.reset();
-
-      await loadAdmin();
-
-
-    }catch(x){
-
-      showMessage(
-        $("venueMsg"),
-        x.message,
-        "error"
-      );
-
-    }finally{
-
-      b.disabled=false;
-
-    }
-
-  }
-);
-
-
-$("eventForm")?.addEventListener(
-  "submit",
-  async e=>{
-
-    e.preventDefault();
-
-    const b=
-      e.currentTarget.querySelector(
-        "button"
-      );
-
-    b.disabled=true;
-
-    try{
-
-      const d=
-        await api(
-          "/admin/events",
-          {
-            method:"POST",
-
-            body:JSON.stringify({
-
-              venueId:
-                Number(
-                  $("venueId").value
-                ),
-
-              title:
-                $("title")
-                  .value
-                  .trim(),
-
-              artist:
-                $("artist")
-                  .value
-                  .trim(),
-
-              date:
-                $("date").value,
-
-              time:
-                $("time").value,
-
-              currency:
-                $("currency")
-                  .value
-                  .trim()
-                  .toUpperCase(),
-
-              image:
-                $("image")
-                  .value
-                  .trim(),
-
-              description:
-                $("description")
-                  .value
-                  .trim()
-
-            })
-          }
-        );
 
 
       showMessage(
         $("eventMsg"),
-        d.message||
-        "Event created successfully using the venue seat map.",
+        response.message ||
+          "Event created successfully!",
         "success"
       );
 
 
+      // Clear form
       e.currentTarget.reset();
 
-      $("currency").value="NGN";
+      manualTickets = [];
 
+      renderManualTickets();
+
+      if ($("currency")) {
+        $("currency").value = "NGN";
+      }
+
+
+      // Reload events
       await loadAdmin();
 
 
-    }catch(x){
+    } catch (err) {
 
       showMessage(
         $("eventMsg"),
-        x.message,
+        err.message,
         "error"
       );
 
-    }finally{
+    } finally {
 
-      b.disabled=false;
-
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Create Event";
+      }
     }
-
   }
 );
 
 
+// =========================
+// GIVE AWAY TICKET
+// =========================
 $("freeForm")?.addEventListener(
   "submit",
-  async e=>{
+  async (e) => {
 
     e.preventDefault();
 
-    const b=
-      e.currentTarget.querySelector(
-        "button"
-      );
+    const button =
+      e.currentTarget.querySelector("button");
 
-    b.disabled=true;
+    button.disabled = true;
 
-    try{
+    try {
 
-      const d=
-        await api(
-          "/admin/free-ticket",
-          {
-            method:"POST",
+      const ticketId =
+        Number($("freeTicket").value);
 
-            body:JSON.stringify({
-
-              userEmail:
-                $("freeEmail")
-                  .value
-                  .trim()
-                  .toLowerCase(),
-
-              ticketId:
-                Number(
-                  $("freeTicket").value
-                )
-
-            })
-          }
+      if (!ticketId) {
+        throw new Error(
+          "Please select a ticket."
         );
+      }
 
+      const response = await api(
+        "/admin/free-ticket",
+        {
+          method: "POST",
+
+          body: JSON.stringify({
+            userEmail:
+              $("freeEmail")
+                .value
+                .trim()
+                .toLowerCase(),
+
+            ticketId
+          })
+        }
+      );
 
       showMessage(
         $("freeMsg"),
-        d.message||
-        "Free ticket issued.",
+        response.message ||
+          "Free ticket issued.",
         "success"
       );
 
-
       await loadAdmin();
 
-
-    }catch(x){
+    } catch (err) {
 
       showMessage(
         $("freeMsg"),
-        x.message,
+        err.message,
         "error"
       );
 
-    }finally{
+    } finally {
 
-      b.disabled=false;
-
+      button.disabled = false;
     }
+  }
+);
 
+
+// =========================
+// INITIAL TICKET
+// =========================
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    // If the ticket container exists,
+    // automatically create Ticket 1.
+    if ($("ticketRows")) {
+
+      manualTickets = [
+        {
+          section: "",
+          row: "",
+          seat: "",
+          price: ""
+        }
+      ];
+
+      renderManualTickets();
+    }
   }
 );
