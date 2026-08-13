@@ -1,6 +1,0 @@
-GITHUB PAGES MOBILE UPLOAD
-
-Upload the CONTENTS of this folder to the ROOT of your GitHub repository.
-Do NOT create a frontend folder.
-
-You should see index.html, style.css, admin.css, JS files, and images/ directly in the repository root.
