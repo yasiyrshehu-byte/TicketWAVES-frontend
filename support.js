@@ -1,0 +1,1 @@
+supportForm?.addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('/support',{method:'POST',body:JSON.stringify({name:name.value,email:email.value,subject:subject.value,message:message.value})});out.textContent=d.message||'Message sent.';out.className='msg success';supportForm.reset()}catch(x){out.textContent=x.message;out.className='msg error'}});
