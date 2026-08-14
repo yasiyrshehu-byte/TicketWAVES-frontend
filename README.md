@@ -1,31 +1,32 @@
-# TicketWAVES Frontend Update
+# TicketWAVES Full Frontend Update
 
-This is a mobile-first TicketWAVES marketplace frontend with:
+This package replaces the previous frontend with a mobile-first marketplace UI and a separate admin control centre.
 
-- Discover
-- For You
-- My Tickets
-- Sell
-- Account
-- Working hash navigation (so GitHub Pages does not produce "Route not found")
-- Barcode rendering for ticket codes
-- Event cards and event detail modal
-- Account settings
-- Admin control centre with separate pages for users, suspended users, events, tickets, available tickets, orders, paid orders, revenue, giveaways, event creation and giveaway creation
-- Gallery image upload on admin event/giveaway forms
-- Ticket section/row/seat editing
-- Local cache that never replaces the backend as the source of truth
+## Included
 
-## API URL
+For easiest GitHub Pages deployment, the site files are also copied at the ZIP root (`index.html`, `admin.html`, `assets/`). You can publish the ZIP root directly.
 
-Edit `assets/js/config.js`:
+- `frontend/index.html` — public TicketWAVES app
+- `frontend/admin.html` — admin app
+- `frontend/assets/js/config.js` — Render API URL
+- `frontend/assets/js/api.js` — API/auth/cache layer
+- `frontend/assets/js/app.js` — user experience
+- `frontend/assets/js/admin.js` — admin pages and CRUD actions
+- `frontend/assets/css/app.css` — public design
+- `frontend/assets/css/admin.css` — admin design
+- `DEPLOYMENT.md` — GitHub Pages + Render deployment notes
+- `backend-integration/README.md` — persistence and ticket ownership requirements
 
-`API_BASE_URL: "https://ticketwaves-backend-3.onrender.com"`
+## Design
 
-Do not add `/api` to the URL. The app adds `/api` automatically.
+The public app uses the requested navigation:
 
-## Important
+Discover | For You | My Tickets | Sell | Account
 
-The browser cannot permanently store users, orders, tickets or revenue for every device. Those records must be saved by the Render backend/database. This frontend therefore treats the API as the source of truth.
+The Account page contains notifications, location, favourites, edit details, security, orders and logout.
 
-If the backend returns an error, the UI will show it rather than silently pretending that a ticket was saved.
+The admin app has separate pages for users, suspended users, events, tickets, available tickets, orders, paid orders, revenue, giveaways, create event, create giveaway and support.
+
+## Critical persistence note
+
+A static GitHub Pages frontend cannot permanently save user accounts or tickets. The Render backend and persistent database must do that. This frontend never treats localStorage as the permanent database.
