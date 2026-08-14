@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>TicketWAVES</title>
+<style>
+:root{--blue:#155eef;--ink:#111827;--muted:#6b7280;--bg:#f4f5f7;--card:#fff;--line:#e5e7eb}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.top{position:sticky;top:0;z-index:50;background:#0b0d12;color:#fff;border-bottom:1px solid #252932}
+.nav{max-width:1180px;margin:auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:25px;font-weight:950;letter-spacing:-1.5px;color:#fff}.logo span{color:#4e8cff}
+.navActions{display:flex;gap:8px}.pill{border:1px solid #343946;background:#171a21;color:#fff;border-radius:999px;padding:9px 15px;font-weight:700}
+.primary{border:0;background:var(--blue);color:#fff;border-radius:12px;padding:13px 17px;font-weight:850}.secondary{border:0;background:#eaf0ff;color:#2047c7;border-radius:12px;padding:12px 16px;font-weight:750}
+.danger{border:0;background:#e5484d;color:#fff;border-radius:12px;padding:11px 15px;font-weight:700}.ghost{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 15px;font-weight:700}
+.page{display:none;min-height:calc(100vh - 62px);padding-bottom:100px}.page.active{display:block}.wrap{max-width:1180px;margin:auto;padding:0 18px}
+.discoverTop{background:#0b0d12;color:#fff;padding-bottom:22px}.discoverNav{padding:18px 0 10px;display:flex;align-items:center;justify-content:space-between}
+.countryDot{width:38px;height:38px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-size:20px}
+.filters{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #252932;margin-top:7px}.filter{padding:16px 12px 14px 0;border-right:1px solid #454954}.filter:last-child{border-right:0;padding-left:18px}
+.filter small{display:block;color:#fff;font-size:12px;font-weight:900;letter-spacing:1px}.filter span{display:block;margin-top:6px;color:#e7e9ee;font-size:18px}
+.searchBox{margin-top:13px;background:#fff;border-radius:9px;padding:5px;display:flex;align-items:center}.searchBox input{border:0;outline:0;flex:1;min-width:0;padding:12px;color:#111;background:#fff;font-size:16px}.searchBox .primary{border-radius:7px;padding:12px 15px}
+.categoryBar{display:flex;gap:10px;overflow:auto;padding:15px 0 3px;scrollbar-width:none}.categoryBar::-webkit-scrollbar{display:none}.categoryBar button{white-space:nowrap;border:1px solid #4b4f59;background:#10131a;color:#fff;border-radius:8px;padding:11px 18px;font-weight:800}.categoryBar button.active{background:#fff;color:#111;border-color:#fff}
+.hero{padding:18px 0 8px}.heroBanner{position:relative;overflow:hidden;min-height:285px;border-radius:20px;background:radial-gradient(circle at 82% 18%,rgba(255,255,255,.23),transparent 25%),linear-gradient(135deg,#13214d,#155eef 52%,#6c4ee8)}
+.heroContent{position:relative;z-index:2;padding:28px 23px;color:#fff;max-width:650px}.heroKicker{font-size:12px;font-weight:900;letter-spacing:2px;opacity:.8}
+.heroContent h1{font-size:clamp(38px,9vw,74px);line-height:.92;letter-spacing:-3px;margin:13px 0}.heroContent p{font-size:16px;line-height:1.45;max-width:530px;color:#eef3ff;margin-bottom:20px}.heroButtons{display:flex;gap:9px;flex-wrap:wrap}.heroButtons .secondary{background:#fff;color:#111}
+.adStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.adCard{min-height:150px;border-radius:18px;padding:18px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 25px rgba(17,24,70,.12)}
+.ad1{background:linear-gradient(135deg,#0b0d12,#263a70)}.ad2{background:linear-gradient(135deg,#7b2cbf,#e84a8a)}.ad3{background:linear-gradient(135deg,#087f5b,#18a878)}
+.adCard small{font-weight:900;letter-spacing:1.2px;opacity:.78}.adCard h3{font-size:22px;line-height:1.05;margin:10px 0 7px;max-width:220px}.adCard p{font-size:12px;margin:0;color:#eef2f7;max-width:210px}.adCard button{margin-top:13px;border:0;border-radius:8px;background:#fff;color:#111;padding:8px 11px;font-weight:800;font-size:12px}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:27px 0 13px}.sectionTitle h2{font-size:29px;letter-spacing:-1.5px;margin:0}.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 7px 22px rgba(17,24,70,.06)}
+.cardImg{width:100%;height:190px;object-fit:cover;background:linear-gradient(135deg,#171d48,#6470ff)}.cardBody{padding:15px}.cardBody h3{font-size:20px;margin:7px 0 5px}.cardBody p{margin:7px 0}.cardBody .primary{width:100%;margin-top:8px}
+.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:#eef2ff;color:#3150ca;font-size:11px;font-weight:850}.empty{background:#fff;border:2px dashed #dedfe7;border-radius:18px;padding:40px;text-align:center;color:var(--muted)}
+.chips{display:flex;gap:9px;overflow:auto;padding-bottom:4px}.chips button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 15px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:19px;margin:18px 0}.form{display:grid;gap:12px}.form input,.form select,.form textarea{width:100%;padding:14px;border:1px solid #dfe1e8;border-radius:12px;outline:0;background:#fff}.form textarea{min-height:110px;resize:vertical}.form label{font-weight:750;font-size:14px}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.98);backdrop-filter:blur(15px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom))}
+.bottom button{border:0;background:transparent;color:#777b88;font-size:11px;padding:5px 2px}.bottom button b{display:block;font-size:22px;line-height:24px}.bottom button.active{color:var(--blue);font-weight:800}
+.profileHead{background:#10152f;color:#fff;border-radius:22px;padding:24px;margin-bottom:18px}.profileHead h2{margin:0 0 5px;font-size:28px}.list{display:grid;gap:10px}
+.row{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;display:flex;justify-content:space-between;align-items:center;gap:14px}.row .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.ticket{background:#11162f;color:#fff;border-radius:23px;padding:17px;margin-bottom:18px;overflow:hidden}.ticketImg{width:100%;max-height:250px;object-fit:cover;border-radius:16px}.ticket h3{font-size:25px;margin:17px 0 6px}
+.ticketGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.ticketCell{background:rgba(255,255,255,.08);border-radius:12px;padding:12px}.ticketCell small{display:block;color:#aeb5d2;font-weight:800}.ticketCode{background:#fff;border-radius:12px;padding:12px;text-align:center;color:#111;margin-top:10px;font-weight:800;letter-spacing:1px}
+.adminTop{background:#10152f;color:#fff}.adminNav{max-width:1200px;margin:auto;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}.adminNav strong{font-size:22px}.adminMenu{display:flex;gap:8px;overflow:auto;padding:5px 0 15px}.adminMenu button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px}.adminMenu button.active{background:var(--blue);color:#fff;border-color:var(--blue)}.adminSection{display:none}.adminSection.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.stat{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px}.stat small{color:var(--muted);font-weight:700}.stat strong{display:block;font-size:28px;margin-top:6px}.adminTable{display:grid;gap:10px}.preview{width:100%;max-height:220px;object-fit:cover;border-radius:16px}
+.modal{position:fixed;inset:0;background:rgba(7,10,25,.55);z-index:100;display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.modalCard{background:#fff;width:min(680px,100%);max-height:90vh;overflow:auto;border-radius:28px 28px 0 0;padding:22px}.close{float:right;border:0;background:#f0f1f5;border-radius:50%;width:38px;height:38px}.toast{position:fixed;top:75px;left:50%;transform:translateX(-50%);z-index:200;background:#10152f;color:#fff;border-radius:13px;padding:12px 18px;display:none;max-width:90%;text-align:center}.toast.show{display:block}
+@media(min-width:800px){.bottom{display:none}.heroBanner{min-height:330px}.heroContent{padding:45px 48px}.modal{align-items:center}.modalCard{border-radius:25px}}
+@media(max-width:700px){.adStrip{grid-template-columns:1fr}.adCard{min-height:125px}}
+@media(max-width:600px){.nav{padding:12px 15px}.logo{font-size:22px}.wrap{padding:0 14px}.hero{padding-top:12px}.heroBanner{min-height:300px;border-radius:19px}.heroContent{padding:27px 20px}.heroContent h1{font-size:49px;letter-spacing:-3px}.heroContent p{font-size:15px}.sectionTitle h2{font-size:27px}.grid{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}.row .actions{justify-content:flex-start}.ticketGrid{grid-template-columns:1fr 1fr}.filter span{font-size:16px}}
+
+.countryPicker{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:150;display:none;align-items:flex-end;justify-content:center}
+.countryPicker.show{display:flex}
+.countryPickerCard{width:min(620px,100%);max-height:82vh;overflow:auto;background:#fff;color:#111;border-radius:26px 26px 0 0;padding:20px}
+.countryPickerHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.countryPickerHead h3{margin:0;font-size:22px}
+.countryClose{border:0;background:#eef0f4;border-radius:50%;width:38px;height:38px;font-size:22px}
+.countrySearch{width:100%;padding:13px;border:1px solid #dfe1e8;border-radius:12px;outline:0;margin-bottom:12px}
+.countryList{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.countryOption{border:1px solid #e3e5eb;background:#fff;border-radius:12px;padding:12px;text-align:left;font-weight:750}
+.countryOption.selected{background:#eaf0ff;border-color:#155eef;color:#155eef}
+@media(min-width:700px){.countryPicker{align-items:center}.countryPickerCard{border-radius:25px}}
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<header class="top">
+  <div class="nav">
+    <div class="logo">TICKET<span>WAVES</span></div>
+    <div class="navActions">
+      <button class="pill" onclick="showPage('discover')">Browse</button>
+      <button id="topAccount" class="pill" onclick="showPage('account')">Account</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="discover" class="page active">
+  <div class="discoverTop">
+    <div class="wrap">
+      <div class="discoverNav">
+        <div class="logo">TICKET<span>WAVES</span></div>
+        <button class="countryDot" id="countryButton" onclick="openCountryPicker()" aria-label="Choose country">🇺🇸</button>
+      </div>
+      <div class="filters">
+        <div class="filter" onclick="openCountryPicker()" style="cursor:pointer"><small>COUNTRY</small><span id="countryDisplay">🇺🇸 United States</span></div>
+        <div class="filter"><small>DATES</small><span>▣ All Dates</span></div>
+      </div>
+      <div class="searchBox">
+        <input id="searchInput" placeholder="Artist, Event or Venue" onkeydown="if(event.key==='Enter')loadEvents()">
+        <button class="primary" onclick="loadEvents()">⌕</button>
+      </div>
+      <div class="categoryBar">
+        <button class="active" onclick="loadEvents()">All</button>
+        <button onclick="loadCategory('Concert')">Concerts</button>
+        <button onclick="loadCategory('Sports')">Sports</button>
+        <button onclick="loadCategory('Theatre')">Arts & Theatre</button>
+        <button onclick="loadCategory('Comedy')">Comedy</button>
+        <button onclick="loadCategory('Festival')">Festivals</button>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="heroBanner">
+        <div class="heroContent">
+          <div class="heroKicker">TICKETWAVES SPOTLIGHT</div>
+          <h1>Live starts here.</h1>
+          <p>Find concerts, sports, theatre and unforgettable nights. Browse TicketWAVES events and keep every ticket in one place.</p>
+          <div class="heroButtons">
+            <button class="primary" onclick="loadEvents()">Find Tickets</button>
+            <button class="secondary" onclick="showPage('foryou')">Explore For You</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="adStrip">
+      <div class="adCard ad1"><small>WEEKEND PICKS</small><h3>Big nights. Better seats.</h3><p>Explore the events people are talking about this week.</p><button onclick="loadEvents()">Browse now</button></div>
+      <div class="adCard ad2"><small>TICKETWAVES EXCLUSIVE</small><h3>Don't miss your next show.</h3><p>New events and ticket drops can appear here automatically.</p><button onclick="loadEvents()">See events</button></div>
+      <div class="adCard ad3"><small>YOUR TICKETS</small><h3>Everything in one place.</h3><p>Sign in to view tickets, orders and your account.</p><button onclick="showPage(token?'tickets':'login')">Open account</button></div>
+    </div>
+    <div class="sectionTitle"><h2>Popular right now</h2><button class="ghost" onclick="loadEvents()">Refresh</button></div>
+    <div id="eventGrid" class="grid"><div class="empty">Loading events...</div></div>
+    <div class="sectionTitle"><h2>Browse by category</h2></div>
+    <div class="chips">
+      <button onclick="loadCategory('Concert')">🎵 Concerts</button><button onclick="loadCategory('Sports')">⚽ Sports</button>
+      <button onclick="loadCategory('Theatre')">🎭 Theatre</button><button onclick="loadCategory('Comedy')">😂 Comedy</button>
+      <button onclick="loadCategory('Festival')">🔥 Festival</button><button onclick="loadCategory('Conference')">♟ Conference</button>
+    </div>
+    <div class="panel" style="margin-top:24px;background:linear-gradient(135deg,#10152f,#1e3a8a);color:#fff;border:0">
+      <div style="font-size:12px;font-weight:900;letter-spacing:1.5px;opacity:.75">TICKETWAVES MEMBERS</div>
+      <h2 style="margin:8px 0">Your next great night is closer than you think.</h2>
+      <p style="color:#dbe5ff">Create an account to keep your tickets, orders and transfers together.</p>
+      <button class="secondary" onclick="showPage(token?'account':'register')">Get started</button>
+    </div>
+  </div>
+</section>
+
+<section id="foryou" class="page">
+  <div class="wrap">
+    <div class="sectionTitle"><h2>For You</h2></div>
+    <p class="muted">Fresh events based on your favourites and interests.</p>
+    <div id="forYouGrid" class="grid"></div>
+  </div>
+</section>
+
+<section id="tickets" class="page">
+  <div class="wrap">
+    <div class="sectionTitle"><h2>My Tickets</h2><button class="ghost" onclick="loadTickets()">Refresh</button></div>
+    <div id="ticketsBox"></div>
+  </div>
+</section>
+
+<section id="sell" class="page">
+  <div class="wrap">
+    <div class="panel">
+      <div style="font-size:70px">🎟️</div>
+      <h2>Sell Tickets</h2>
+      <p class="muted">Plans changed? Manage tickets you own from your TicketWAVES account.</p>
+      <button class="primary" onclick="showSellInfo()">Sell Your Tickets</button>
+    </div>
+    <div id="sellBox"></div>
+  </div>
+</section>
+
+<section id="account" class="page">
+  <div class="wrap">
+    <div id="accountBox"></div>
+  </div>
+</section>
+
+<section id="eventDetails" class="page">
+  <div class="wrap" id="eventDetailsBox"></div>
+</section>
+
+<section id="checkout" class="page">
+  <div class="wrap" id="checkoutBox"></div>
+</section>
+
+<section id="login" class="page">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Sign in</h2>
+      <form class="form" onsubmit="login(event)">
+        <input id="loginEmail" type="email" placeholder="Email" required>
+        <input id="loginPassword" type="password" placeholder="Password" required>
+        <button class="primary">Sign in</button>
+      </form>
+      <p class="muted">Don't have an account?</p>
+      <button class="secondary" onclick="showPage('register')">Create account</button>
+    </div>
+  </div>
+</section>
+
+<section id="register" class="page">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Create account</h2>
+      <form class="form" onsubmit="registerUser(event)">
+        <input id="registerName" placeholder="Full name" required>
+        <input id="registerEmail" type="email" placeholder="Email" required>
+        <input id="registerPassword" type="password" placeholder="Password (6+ characters)" minlength="6" required>
+        <button class="primary">Create account</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="admin" class="page">
+  <div class="adminTop">
+    <div class="adminNav">
+      <strong>TicketWAVES Admin</strong>
+      <button class="danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="adminMenu">
+      <button onclick="adminPage('dashboard')">Dashboard</button>
+      <button onclick="adminPage('users')">Users</button>
+      <button onclick="adminPage('suspended')">Suspended</button>
+      <button onclick="adminPage('events')">Events</button>
+      <button onclick="adminPage('tickets')">Tickets</button>
+      <button onclick="adminPage('orders')">Orders</button>
+      <button onclick="adminPage('giveaways')">Giveaways</button>
+      <button onclick="adminPage('createEvent')">Create Event</button>
+      <button onclick="adminPage('createTicket')">Create Ticket</button>
+      <button onclick="adminPage('createGiveaway')">Create Giveaway</button>
+    </div>
+
+    <div id="adminDashboard" class="adminSection active">
+      <h2>Dashboard</h2><div id="stats" class="stats"></div>
+    </div>
+
+    <div id="adminUsers" class="adminSection"><h2>Users</h2><div id="usersList" class="adminTable"></div></div>
+    <div id="adminSuspended" class="adminSection"><h2>Suspended Users</h2><div id="suspendedList" class="adminTable"></div></div>
+    <div id="adminEvents" class="adminSection"><h2>Events</h2><div id="adminEventsList" class="adminTable"></div></div>
+    <div id="adminTickets" class="adminSection"><h2>All Tickets</h2><div id="adminTicketsList" class="adminTable"></div></div>
+    <div id="adminOrders" class="adminSection"><h2>Orders</h2><div id="adminOrdersList" class="adminTable"></div></div>
+    <div id="adminGiveaways" class="adminSection"><h2>Giveaways</h2><div id="adminGiveawaysList" class="adminTable"></div></div>
+
+    <div id="adminCreateEvent" class="adminSection">
+      <div class="panel">
+        <h2>Create Event</h2>
+        <form class="form" onsubmit="createEvent(event)">
+          <input id="aTitle" placeholder="Event title" required>
+          <input id="aArtist" placeholder="Artist">
+          <select id="aCategory"><option>Concert</option><option>Sports</option><option>Theatre</option><option>Comedy</option><option>Festival</option><option>Conference</option></select>
+          <input id="aDate" type="date" required>
+          <input id="aTime" type="time" required>
+          <input id="aVenue" placeholder="Venue" required>
+          <input id="aCity" placeholder="City">
+          <input id="aCountry" placeholder="Country">
+          <textarea id="aDescription" placeholder="Event information"></textarea>
+          <input id="aImage" type="file" accept="image/*" onchange="previewFile(this,'aPreview')">
+          <img id="aPreview" class="preview hidden">
+          <button class="primary">Create Event</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="adminCreateTicket" class="adminSection">
+      <div class="panel">
+        <h2>Create Ticket</h2>
+        <form class="form" onsubmit="createTicket(event)">
+          <select id="aTicketEvent" required></select>
+          <input id="aSection" placeholder="Section">
+          <input id="aRow" placeholder="Row">
+          <input id="aSeat" placeholder="Seat">
+          <input id="aQuantity" type="number" min="1" value="1" placeholder="Quantity">
+          <input id="aPrice" type="number" min="0" placeholder="Price">
+          <textarea id="aTicketInfo" placeholder="Additional ticket information"></textarea>
+          <button class="primary">Create Ticket</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="adminCreateGiveaway" class="adminSection">
+      <div class="panel">
+        <h2>Create Giveaway</h2>
+        <p class="muted">This is separate from creating an event. Enter the recipient's existing TicketWAVES account email and issue the ticket directly to that account.</p>
+        <form class="form" onsubmit="createGiveaway(event)">
+          <input id="gEmail" type="email" placeholder="Recipient account email" required>
+          <input id="gTitle" placeholder="Event title" required>
+          <input id="gArtist" placeholder="Artist">
+          <input id="gDate" type="date" required>
+          <input id="gTime" type="time" required>
+          <input id="gVenue" placeholder="Venue" required>
+          <input id="gCity" placeholder="City">
+          <input id="gCountry" placeholder="Country">
+          <input id="gSection" placeholder="Section">
+          <input id="gRow" placeholder="Row">
+          <input id="gSeat" placeholder="Seat">
+          <input id="gQuantity" type="number" min="1" value="1">
+          <input id="gPrice" type="number" min="0" value="0">
+          <textarea id="gInfo" placeholder="Additional information"></textarea>
+          <input id="gImage" type="file" accept="image/*">
+          <button class="primary">Issue Giveaway Ticket</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="bottom">
+  <button id="navDiscover" onclick="showPage('discover')"><b>⌕</b>Discover</button>
+  <button id="navForyou" onclick="showPage('foryou')"><b>♡</b>For You</button>
+  <button id="navTickets" onclick="showPage('tickets')"><b>🎟</b>My Tickets</button>
+  <button id="navSell" onclick="showPage('sell')"><b>◉</b>Sell</button>
+  <button id="navAccount" onclick="showPage('account')"><b>●</b>Account</button>
+</nav>
+
+
+<div id="countryPicker" class="countryPicker" onclick="if(event.target===this)closeCountryPicker()">
+  <div class="countryPickerCard">
+    <div class="countryPickerHead">
+      <h3>Choose your country</h3>
+      <button class="countryClose" onclick="closeCountryPicker()">×</button>
+    </div>
+    <input id="countrySearch" class="countrySearch" placeholder="Search country..." oninput="renderCountryOptions(this.value)">
+    <div id="countryList" class="countryList"></div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modalCard">
+    <button class="close" onclick="closeModal()">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   TICKETWAVES FRONTEND
+   Change ONLY API_BASE if your Render service URL changes.
+========================================================= */
+const API_BASE="https://ticketwaves-backend-3.onrender.com/api";
+// Render backend connection: keep this URL unless your Render service URL changes.
+let token=localStorage.getItem("ticketwaves_token")||"";
+let currentUser=null;
+let currentEvent=null;
+let selectedCountry=localStorage.getItem("ticketwaves_country")||"United States";
+const countryOptions=[
+  ["United States","🇺🇸"],["United Kingdom","🇬🇧"],["Canada","🇨🇦"],["Nigeria","🇳🇬"],
+  ["France","🇫🇷"],["Germany","🇩🇪"],["Spain","🇪🇸"],["Italy","🇮🇹"],
+  ["Netherlands","🇳🇱"],["Belgium","🇧🇪"],["Portugal","🇵🇹"],["Ireland","🇮🇪"],
+  ["Australia","🇦🇺"],["New Zealand","🇳🇿"],["Japan","🇯🇵"],["South Korea","🇰🇷"],
+  ["Singapore","🇸🇬"],["Philippines","🇵🇭"],["Mexico","🇲🇽"],["Brazil","🇧🇷"],
+  ["South Africa","🇿🇦"],["Ghana","🇬🇭"],["United Arab Emirates","🇦🇪"]
+];
+
+function selectedCountryFlag(){
+  const found=countryOptions.find(x=>x[0]===selectedCountry);
+  return found?found[1]:"🌍";
+}
+
+function updateCountryUI(){
+  const flag=selectedCountryFlag();
+  const display=$("countryDisplay");
+  const button=$("countryButton");
+  if(display)display.textContent=flag+" "+selectedCountry;
+  if(button)button.textContent=flag;
+}
+
+function openCountryPicker(){
+  const picker=$("countryPicker");
+  if(!picker)return;
+  picker.classList.add("show");
+  renderCountryOptions("");
+  setTimeout(()=>{$("countrySearch")?.focus()},50);
+}
+
+function closeCountryPicker(){
+  $("countryPicker")?.classList.remove("show");
+}
+
+function renderCountryOptions(query){
+  const q=(query||"").trim().toLowerCase();
+  const list=$("countryList");
+  if(!list)return;
+  const matches=countryOptions.filter(x=>x[0].toLowerCase().includes(q));
+  list.innerHTML=matches.map(x=>`
+    <button class="countryOption ${x[0]===selectedCountry?"selected":""}" onclick="selectCountry('${x[0].replace(/'/g,"\\'")}')">
+      ${x[1]} ${x[0]} ${x[0]===selectedCountry?"✓":""}
+    </button>`).join("") || '<div class="empty" style="grid-column:1/-1">No country found.</div>';
+}
+
+function selectCountry(country){
+  selectedCountry=country;
+  localStorage.setItem("ticketwaves_country",country);
+  updateCountryUI();
+  closeCountryPicker();
+  loadEvents();
+}
+
+
+const $=id=>document.getElementById(id);
+
+function toast(message){
+  $("toast").textContent=message;
+  $("toast").classList.add("show");
+  clearTimeout(window._toast);
+  window._toast=setTimeout(()=>$("toast").classList.remove("show"),2800);
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+function authHeaders(){
+  const h={"Content-Type":"application/json"};
+  if(token)h.Authorization="Bearer "+token;
+  return h;
+}
+
+async function api(path,options={}){
+  const res=await fetch(API_BASE+path,{...options,headers:{...authHeaders(),...(options.headers||{})}});
+  const text=await res.text();
+  let data={};
+  try{data=text?JSON.parse(text):{}}catch(e){data={message:text||"Invalid server response"}}
+  if(!res.ok)throw new Error(data.message||"Request failed");
+  return data;
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const page=$(id);
+  if(page)page.classList.add("active");
+  document.querySelectorAll(".bottom button").forEach(b=>b.classList.remove("active"));
+  const map={discover:"navDiscover",foryou:"navForyou",tickets:"navTickets",sell:"navSell",account:"navAccount"};
+  if(map[id]&&$(map[id]))$(map[id]).classList.add("active");
+  window.scrollTo(0,0);
+  if(id==="discover")loadEvents();
+  if(id==="foryou")loadForYou();
+  if(id==="tickets")loadTickets();
+  if(id==="account")loadAccount();
+}
+
+async function loadEvents(){
+  const q=($("searchInput")?.value||"").trim();
+  const box=$("eventGrid");
+  box.innerHTML='<div class="empty">Loading events...</div>';
+  try{
+    const data=await api("/events"+(q?"?search="+encodeURIComponent(q):""));
+    const filtered=data.filter(e=>{
+      if(!selectedCountry)return true;
+      return !e.country || String(e.country).toLowerCase()===selectedCountry.toLowerCase();
+    });
+    renderEvents(filtered,box);
+    if(!filtered.length && data.length){
+      box.innerHTML='<div class="empty">No events found in '+esc(selectedCountry)+'. Choose another country to explore more events.</div>';
+    }
+  }catch(e){
+    box.innerHTML='<div class="empty">Could not load events.<br><small>'+esc(e.message)+'</small></div>';
+  }
+}
+
+async function loadCategory(category){
+  showPage("discover");
+  const box=$("eventGrid");
+  box.innerHTML='<div class="empty">Loading '+esc(category)+'...</div>';
+  try{
+    const data=await api("/events?category="+encodeURIComponent(category));
+    const filtered=data.filter(e=>!selectedCountry || !e.country || String(e.country).toLowerCase()===selectedCountry.toLowerCase());
+    renderEvents(filtered,box);
+    if(!filtered.length && data.length){
+      box.innerHTML='<div class="empty">No '+esc(category)+' events found in '+esc(selectedCountry)+'.</div>';
+    }
+  }catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+function renderEvents(events,box){
+  if(!events.length){box.innerHTML='<div class="empty">No events yet.</div>';return}
+  box.innerHTML=events.map(e=>`
+    <article class="card">
+      ${e.image?`<img class="cardImg" src="${esc(e.image)}" onerror="this.style.display='none'">`:`<div class="cardImg"></div>`}
+      <div class="cardBody">
+        <span class="tag">${esc(e.category||"Event")}</span>
+        <h3>${esc(e.title)}</h3>
+        <div class="muted">${esc(e.artist||"Live event")}</div>
+        <p class="muted">📅 ${esc(e.date)} · ${esc(e.time)}</p>
+        <p class="muted">📍 ${esc(e.venue)}${e.city?" · "+esc(e.city):""}</p>
+        <button class="primary" onclick="openEvent('${e._id}')">Find Tickets</button>
+      </div>
+    </article>`).join("");
+}
+
+async function openEvent(id){
+  try{
+    const data=await api("/events/"+id);
+    currentEvent=data.event;
+    showPage("eventDetails");
+    $("eventDetailsBox").innerHTML=`
+      <button class="ghost" onclick="showPage('discover')">← Back</button>
+      <div class="panel">
+        ${data.event.image?`<img class="preview" style="display:block;max-height:380px" src="${esc(data.event.image)}">`:""}
+        <span class="tag">${esc(data.event.category||"Event")}</span>
+        <h1>${esc(data.event.title)}</h1>
+        <p>${esc(data.event.artist||"")}</p>
+        <p>📅 ${esc(data.event.date)} · ${esc(data.event.time)}</p>
+        <p>📍 ${esc(data.event.venue)}${data.event.city?", "+esc(data.event.city):""}</p>
+        <p class="muted">${esc(data.event.description||"")}</p>
+      </div>
+      <div class="sectionTitle"><h2>Available tickets</h2></div>
+      <div class="list">${data.tickets.length?data.tickets.map(t=>`
+        <div class="row">
+          <div>
+            <strong>Section ${esc(t.section||"-")}</strong>
+            <div class="muted">Row ${esc(t.row||"-")} · Seat ${esc(t.seat||"-")} · Qty ${esc(t.quantity||1)}</div>
+            <strong>₦${Number(t.price||0).toLocaleString()}</strong>
+          </div>
+          <button class="primary" onclick="buyTicket('${t._id}')">Buy</button>
+        </div>`).join(""):'<div class="empty">No tickets currently available.</div>'}</div>`;
+  }catch(e){toast(e.message)}
+}
+
+async function buyTicket(ticketId){
+  if(!token){toast("Please sign in first");showPage("login");return}
+  try{
+    const result=await api("/orders",{method:"POST",body:JSON.stringify({ticketIds:[ticketId]})});
+    showPage("checkout");
+    $("checkoutBox").innerHTML=`
+      <div class="panel">
+        <h2>Checkout</h2>
+        <p>Order reference:</p>
+        <strong>${esc(result.payment.reference)}</strong>
+        <h3>₦${Number(result.payment.amount||0).toLocaleString()}</h3>
+        <p class="muted">Test payment mode is enabled on the current backend.</p>
+        <button class="primary" onclick="completePayment('${esc(result.payment.reference)}')">Complete Test Payment</button>
+      </div>`;
+  }catch(e){toast(e.message)}
+}
+
+async function completePayment(reference){
+  try{
+    await api("/payments/mock/complete",{method:"POST",body:JSON.stringify({reference})});
+    toast("Payment complete — ticket added to My Tickets");
+    showPage("tickets");
+  }catch(e){toast(e.message)}
+}
+
+async function loadTickets(){
+  const box=$("ticketsBox");
+  if(!token){box.innerHTML=`<div class="empty">Sign in to see your tickets.<br><br><button class="primary" onclick="showPage('login')">Sign in</button></div>`;return}
+  box.innerHTML='<div class="empty">Loading your tickets...</div>';
+  try{
+    const tickets=await api("/tickets/me");
+    if(!tickets.length){box.innerHTML='<div class="empty">You do not have any tickets yet.</div>';return}
+    box.innerHTML=tickets.map(t=>{
+      const e=t.eventId||{};
+      return `<article class="ticket">
+        ${e.image?`<img class="ticketImg" src="${esc(e.image)}">`:""}
+        <h3>${esc(e.title||"TicketWAVES Event")}</h3>
+        <div class="muted" style="color:#c4c9df">${esc(e.date||"")} · ${esc(e.time||"")}</div>
+        <p>${esc(e.venue||"")}${e.city?" · "+esc(e.city):""}</p>
+        <div class="ticketGrid">
+          <div class="ticketCell"><small>SECTION</small>${esc(t.section||"-")}</div>
+          <div class="ticketCell"><small>ROW</small>${esc(t.row||"-")}</div>
+          <div class="ticketCell"><small>SEAT</small>${esc(t.seat||"-")}</div>
+          <div class="ticketCell"><small>QUANTITY</small>${esc(t.quantity||1)}</div>
+        </div>
+        <div class="ticketCode">${esc(t.ticketCode||"")}</div>
+        <br>
+        <button class="secondary" onclick="transferTicket('${t._id}')">Transfer</button>
+      </article>`;
+    }).join("");
+  }catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function transferTicket(id){
+  if(!token)return;
+  const email=prompt("Enter the recipient's TicketWAVES account email:");
+  if(!email)return;
+  try{
+    await api("/tickets/"+id+"/transfer",{method:"POST",body:JSON.stringify({email})});
+    toast("Ticket transferred");
+    loadTickets();
+  }catch(e){toast(e.message)}
+}
+
+async function loadForYou(){
+  const box=$("forYouGrid");
+  box.innerHTML='<div class="empty">Loading recommendations...</div>';
+  try{
+    const events=await api("/events");
+    renderEvents(events.slice(0,8),box);
+  }catch(e){box.innerHTML='<div class="empty">Sign in to personalize your recommendations.</div>'}
+}
+
+async function loadAccount(){
+  const box=$("accountBox");
+  if(!token){
+    box.innerHTML=`<div class="panel"><h2>Account</h2><p class="muted">Sign in to manage your TicketWAVES account.</p><button class="primary" onclick="showPage('login')">Sign in</button> <button class="secondary" onclick="showPage('register')">Create account</button></div>`;
+    return;
+  }
+  try{
+    const data=await api("/auth/me");
+    currentUser=data.user;
+    if(currentUser.role==="admin"){
+      box.innerHTML=`<div class="profileHead"><h2>${esc(currentUser.name)}</h2><div>${esc(currentUser.email)}</div><p>Administrator account</p></div>
+      <div class="panel"><button class="primary" onclick="adminPage('dashboard');showPage('admin')">Open Admin Dashboard</button></div>
+      <div class="panel"><button class="secondary" onclick="showPage('tickets')">My Tickets</button> <button class="danger" onclick="logout()">Logout</button></div>`;
+      return;
+    }
+    box.innerHTML=`<div class="profileHead"><h2>${esc(currentUser.name)}</h2><div>${esc(currentUser.email)}</div></div>
+      <div class="panel"><h3>Notifications</h3><p>Receive Notifications: <strong>${currentUser.notifications?"ON":"OFF"}</strong></p><button class="secondary" onclick="toggleNotifications(${!currentUser.notifications})">Change</button></div>
+      <div class="panel"><h3>Location Settings</h3><p>My Location: ${esc(currentUser.location||"Not set")}</p><p>My Country: ${esc(currentUser.country||"Not set")}</p><button class="secondary" onclick="editAccount()">Edit Details</button></div>
+      <div class="panel"><h3>Preferences</h3><button class="secondary" onclick="showPage('tickets')">My Tickets</button> <button class="secondary" onclick="showOrders()">My Orders</button></div>
+      <div class="panel"><button class="danger" onclick="logout()">Logout</button></div>`;
+  }catch(e){logout()}
+}
+
+async function editAccount(){
+  const name=prompt("Name",currentUser?.name||"");
+  if(name===null)return;
+  const location=prompt("Location",currentUser?.location||"");
+  const country=prompt("Country",currentUser?.country||"");
+  try{
+    await api("/account",{method:"PUT",body:JSON.stringify({name,location,country})});
+    toast("Account updated");
+    loadAccount();
+  }catch(e){toast(e.message)}
+}
+
+async function toggleNotifications(value){
+  try{await api("/account",{method:"PUT",body:JSON.stringify({notifications:value})});loadAccount()}catch(e){toast(e.message)}
+}
+
+async function showOrders(){
+  if(!token)return;
+  try{
+    const orders=await api("/orders/me");
+    showPage("account");
+    $("accountBox").innerHTML=`<button class="ghost" onclick="loadAccount()">← Account</button><div class="sectionTitle"><h2>My Orders</h2></div><div class="list">${orders.length?orders.map(o=>`<div class="row"><div><strong>${esc(o.reference)}</strong><div class="muted">${new Date(o.createdAt).toLocaleString()}</div></div><div><strong>₦${Number(o.amount||0).toLocaleString()}</strong><div>${esc(o.status)}</div></div></div>`).join(""):'<div class="empty">No orders yet.</div>'}</div>`;
+  }catch(e){toast(e.message)}
+}
+
+function showSellInfo(){
+  $("sellBox").innerHTML=`<div class="panel"><h3>Tickets I'm Selling</h3><p class="muted">Your current backend supports ownership, transfer and ticket management. A public resale workflow can be added without changing the main navigation.</p></div><div class="panel"><h3>Sold Tickets</h3><p class="muted">Your sold ticket history will appear here once resale orders are enabled.</p></div>`;
+}
+
+async function login(e){
+  e.preventDefault();
+  try{
+    const data=await api("/auth/login",{method:"POST",body:JSON.stringify({email:$("loginEmail").value,password:$("loginPassword").value})});
+    token=data.token;localStorage.setItem("ticketwaves_token",token);currentUser=data.user;
+    toast("Welcome back");
+    if(data.user.role==="admin"){showPage("admin");adminPage("dashboard")}else showPage("account");
+  }catch(err){toast(err.message)}
+}
+
+async function registerUser(e){
+  e.preventDefault();
+  try{
+    const data=await api("/auth/register",{method:"POST",body:JSON.stringify({name:$("registerName").value,email:$("registerEmail").value,password:$("registerPassword").value})});
+    token=data.token;localStorage.setItem("ticketwaves_token",token);currentUser=data.user;
+    toast("Account created");
+    showPage("account");
+  }catch(err){toast(err.message)}
+}
+
+function logout(){
+  token="";currentUser=null;localStorage.removeItem("ticketwaves_token");toast("Logged out");showPage("discover");
+}
+
+/* ================= ADMIN ================= */
+
+async function ensureAdmin(){
+  if(!token){showPage("login");return false}
+  try{
+    const data=await api("/auth/me");
+    if(data.user.role!=="admin"){toast("Administrator access required");return false}
+    currentUser=data.user;return true;
+  }catch(e){toast(e.message);return false}
+}
+
+async function adminPage(name){
+  if(!(await ensureAdmin()))return;
+  document.querySelectorAll(".adminSection").forEach(x=>x.classList.remove("active"));
+  const id="admin"+name.charAt(0).toUpperCase()+name.slice(1);
+  if($(id))$(id).classList.add("active");
+  if(name==="dashboard")loadAdminStats();
+  if(name==="users")loadAdminUsers();
+  if(name==="suspended")loadAdminSuspended();
+  if(name==="events")loadAdminEvents();
+  if(name==="tickets")loadAdminTickets();
+  if(name==="orders")loadAdminOrders();
+  if(name==="giveaways")loadAdminGiveaways();
+  if(name==="createTicket")loadTicketEventOptions();
+}
+
+async function loadAdminStats(){
+  try{
+    const d=await api("/admin/stats");
+    $("stats").innerHTML=Object.entries({
+      Users:d.users,Suspended:d.suspendedUsers,Events:d.events,Tickets:d.tickets,
+      Available:d.availableTickets,Orders:d.orders,Paid:d.paidOrders,
+      Giveaways:d.giveaways,Revenue:"₦"+Number(d.revenue||0).toLocaleString()
+    }).map(([k,v])=>`<div class="stat"><small>${k}</small><strong>${esc(v)}</strong></div>`).join("");
+  }catch(e){$("stats").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function loadAdminUsers(){
+  try{
+    const users=await api("/admin/users");
+    $("usersList").innerHTML=users.map(u=>`<div class="row"><div><strong>${esc(u.name)}</strong><div class="muted">${esc(u.email)}</div><small>Role: ${esc(u.role)}</small></div><div class="actions"><button class="secondary" onclick="suspendUser('${u._id}',${!u.suspended})">${u.suspended?"Restore":"Suspend"}</button></div></div>`).join("");
+  }catch(e){$("usersList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function loadAdminSuspended(){
+  try{
+    const users=await api("/admin/suspended-users");
+    $("suspendedList").innerHTML=users.length?users.map(u=>`<div class="row"><div><strong>${esc(u.name)}</strong><div>${esc(u.email)}</div></div><button class="secondary" onclick="suspendUser('${u._id}',false)">Restore</button></div>`).join(""):'<div class="empty">No suspended users.</div>';
+  }catch(e){$("suspendedList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function suspendUser(id,value){
+  try{await api("/admin/users/"+id+"/suspend",{method:"PUT",body:JSON.stringify({suspended:value})});toast(value?"User suspended":"User restored");loadAdminUsers();loadAdminSuspended();loadAdminStats()}catch(e){toast(e.message)}
+}
+
+async function loadAdminEvents(){
+  try{
+    const events=await api("/admin/events");
+    $("adminEventsList").innerHTML=events.map(e=>`<div class="row"><div><strong>${esc(e.title)}</strong><div class="muted">${esc(e.artist||"")} · ${esc(e.date)} · ${esc(e.time)}</div><div>${esc(e.venue)}${e.city?" · "+esc(e.city):""}</div></div><div class="actions"><button class="danger" onclick="archiveEvent('${e._id}')">Archive</button></div></div>`).join("");
+  }catch(e){$("adminEventsList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function archiveEvent(id){
+  if(!confirm("Archive this event?"))return;
+  try{await api("/admin/events/"+id,{method:"DELETE"});toast("Event archived");loadAdminEvents();loadAdminStats()}catch(e){toast(e.message)}
+}
+
+async function loadAdminTickets(){
+  try{
+    const tickets=await api("/admin/tickets");
+    $("adminTicketsList").innerHTML=tickets.map(t=>`<div class="row"><div><strong>${esc(t.ticketCode)}</strong><div>${esc(t.eventId?.title||"")}</div><div class="muted">Section ${esc(t.section||"-")} · Row ${esc(t.row||"-")} · Seat ${esc(t.seat||"-")}</div><div>₦${Number(t.price||0).toLocaleString()} · ${esc(t.status)}</div></div><div class="actions"><button class="secondary" onclick="editTicket('${t._id}')">Edit</button><button class="danger" onclick="cancelTicket('${t._id}')">Delete</button></div></div>`).join("");
+  }catch(e){$("adminTicketsList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function editTicket(id){
+  const section=prompt("Section:");
+  if(section===null)return;
+  const row=prompt("Row:");
+  const seat=prompt("Seat:");
+  const price=prompt("Price:");
+  const info=prompt("Additional information:");
+  try{
+    await api("/admin/tickets/"+id,{method:"PUT",body:JSON.stringify({section,row,seat,price:Number(price||0),additionalInfo:info||""})});
+    toast("Ticket updated");loadAdminTickets();
+  }catch(e){toast(e.message)}
+}
+
+async function cancelTicket(id){
+  if(!confirm("Delete/cancel this ticket?"))return;
+  try{await api("/admin/tickets/"+id,{method:"DELETE"});toast("Ticket cancelled");loadAdminTickets();loadAdminStats()}catch(e){toast(e.message)}
+}
+
+async function loadAdminOrders(){
+  try{
+    const orders=await api("/admin/orders");
+    $("adminOrdersList").innerHTML=orders.map(o=>`<div class="row"><div><strong>${esc(o.reference)}</strong><div class="muted">${esc(o.userId?.email||"")}</div><div>${new Date(o.createdAt).toLocaleString()}</div></div><div><strong>₦${Number(o.amount||0).toLocaleString()}</strong><div>${esc(o.status)}</div></div></div>`).join("");
+  }catch(e){$("adminOrdersList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function loadAdminGiveaways(){
+  try{
+    const list=await api("/admin/giveaways");
+    $("adminGiveawaysList").innerHTML=list.map(g=>`<div class="row"><div><strong>${esc(g.eventTitle)}</strong><div>Recipient: ${esc(g.recipientId?.email||"")}</div><div class="muted">${esc(g.date)} · ${esc(g.time)} · ${esc(g.venue)}</div><div>Section ${esc(g.section||"-")} · Row ${esc(g.row||"-")} · Seat ${esc(g.seat||"-")}</div></div></div>`).join("");
+  }catch(e){$("adminGiveawaysList").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+
+async function createEvent(e){
+  e.preventDefault();
+  try{
+    const image=await fileToDataUrl($("aImage"));
+    await api("/admin/events",{method:"POST",body:JSON.stringify({
+      title:$("aTitle").value,artist:$("aArtist").value,category:$("aCategory").value,date:$("aDate").value,time:$("aTime").value,
+      venue:$("aVenue").value,city:$("aCity").value,country:$("aCountry").value,description:$("aDescription").value,image
+    })});
+    toast("Event created");e.target.reset();adminPage("events");
+  }catch(err){toast(err.message)}
+}
+
+async function loadTicketEventOptions(){
+  try{
+    const events=await api("/admin/events");
+    $("aTicketEvent").innerHTML=events.map(e=>`<option value="${e._id}">${esc(e.title)}</option>`).join("");
+  }catch(e){toast(e.message)}
+}
+
+async function createTicket(e){
+  e.preventDefault();
+  try{
+    await api("/admin/tickets",{method:"POST",body:JSON.stringify({
+      eventId:$("aTicketEvent").value,section:$("aSection").value,row:$("aRow").value,seat:$("aSeat").value,
+      quantity:Number($("aQuantity").value||1),price:Number($("aPrice").value||0),additionalInfo:$("aTicketInfo").value
+    })});
+    toast("Ticket created");e.target.reset();adminPage("tickets");
+  }catch(err){toast(err.message)}
+}
+
+async function createGiveaway(e){
+  e.preventDefault();
+  try{
+    const image=await fileToDataUrl($("gImage"));
+    await api("/admin/giveaways",{method:"POST",body:JSON.stringify({
+      recipientEmail:$("gEmail").value,eventTitle:$("gTitle").value,artist:$("gArtist").value,date:$("gDate").value,time:$("gTime").value,
+      venue:$("gVenue").value,city:$("gCity").value,country:$("gCountry").value,section:$("gSection").value,row:$("gRow").value,seat:$("gSeat").value,
+      quantity:Number($("gQuantity").value||1),price:Number($("gPrice").value||0),additionalInfo:$("gInfo").value,image
+    })});
+    toast("Giveaway ticket issued");e.target.reset();adminPage("giveaways");
+  }catch(err){toast(err.message)}
+}
+
+function fileToDataUrl(input){
+  return new Promise(resolve=>{
+    const f=input?.files?.[0];
+    if(!f){resolve("");return}
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=()=>resolve("");
+    r.readAsDataURL(f);
+  });
+}
+
+function previewFile(input,id){
+  const f=input.files?.[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{$(id).src=r.result;$(id).classList.remove("hidden")};r.readAsDataURL(f);
+}
+
+function closeModal(){$("modal").classList.remove("show")}
+function openModal(html){$("modalBody").innerHTML=html;$("modal").classList.add("show")}
+
+async function boot(){
+  updateCountryUI();
+  if(token){
+    try{
+      const d=await api("/auth/me");currentUser=d.user;
+      if(d.user.role==="admin")$("topAccount").textContent="Admin";
+    }catch(e){token="";localStorage.removeItem("ticketwaves_token")}
+  }
+  showPage("discover");
+}
+
+boot();
+</script>
+</body>
+</html>
