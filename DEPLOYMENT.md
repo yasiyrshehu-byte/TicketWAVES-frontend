@@ -1,136 +1,75 @@
-# TicketWAVES deployment
+# TicketWAVES V2 deployment
 
-## 1. Frontend on GitHub Pages
+## Why this version looks different
+The previous deployment showed raw HTML because the browser was not receiving the CSS files.
+This V2 package embeds the application CSS and JavaScript directly inside `index.html` and
+`admin.html`, while also keeping the normal `assets/` files in the package.
 
-Upload the contents of `frontend/` to the GitHub Pages branch/root used by your site.
+That means GitHub Pages can render the design even if a relative `assets/` path was accidentally
+omitted during deployment.
 
-The important files are:
+## GitHub Pages
 
-- `index.html`
-- `admin.html`
-- `assets/css/app.css`
-- `assets/css/admin.css`
-- `assets/js/config.js`
-- `assets/js/api.js`
-- `assets/js/app.js`
-- `assets/js/admin.js`
+1. Extract this ZIP.
+2. Upload **all contents of the extracted folder** to the root of the GitHub Pages repository.
+3. Make sure `index.html` is in the repository root.
+4. Make sure `admin.html` is in the repository root.
+5. Commit and push.
+6. In GitHub: Settings -> Pages -> deploy from the branch/folder containing `index.html`.
+7. Wait for the Pages deployment to finish.
+8. Open the GitHub Pages URL in a private/incognito tab or hard-refresh the page.
 
-This version uses hash routes (`#discover`, `#tickets`, `#account`, etc.) so GitHub Pages will not try to find physical `/tickets.html` or `/profile.html` routes.
+Do not upload only `index.html`. Upload the whole package.
 
-## 2. Render URL
+## Render backend
 
-Open `frontend/assets/js/config.js` and make sure:
+The frontend is configured for:
 
-`API_BASE_URL` is your Render service root.
+https://ticketwaves-backend-3.onrender.com
 
-For the current service:
+The code automatically adds `/api`.
 
-`https://ticketwaves-backend-3.onrender.com`
+Therefore, the configured value is the Render service root, **not** a URL ending in `/api`.
 
-Do NOT put `/api` into `API_BASE_URL`.
+## Important data persistence
 
-The frontend automatically calls:
+GitHub Pages is static hosting. It cannot permanently store user accounts, orders, tickets,
+events or giveaways.
 
-`https://ticketwaves-backend-3.onrender.com/api/...`
+Those records must be written to your Render backend and MongoDB. LocalStorage is only a
+temporary browser cache and must never be treated as the database.
 
-## 3. Backend persistence is required
-
-GitHub Pages is static hosting. It cannot permanently save:
-
+The backend must persist:
 - users
-- passwords
+- suspended users
+- events
 - tickets
+- available tickets
 - orders
 - paid orders
-- giveaways
-- event records
 - revenue
-- suspended users
+- giveaways
+- ticket ownership / transfers
 
-Those must be stored in the Render backend database.
+## No email dependency for ticket ownership
 
-If data disappears after a few minutes, check the Render backend and MongoDB connection. A frontend cannot repair a database that is dropping or resetting records.
+Admin giveaways should assign the ticket directly to the recipient user record. Email can be
+used as a notification later, but email delivery must not be required for the ticket to appear
+in **My Tickets**.
 
-## 4. Required API resources
+Likewise, a paid order must create/persist the ticket record and associate it with the buyer's
+user ID before the checkout/order request is considered successful.
 
-The frontend is designed around these REST resources:
+## Gallery images
 
-### Public/user
+The Create Event and Create Giveaway screens use file inputs for device gallery uploads.
+The selected image is previewed before submission. The backend should store the uploaded image
+or a durable image-storage URL; do not store a temporary browser object URL as the permanent image.
 
-- `GET /api/events`
-- `GET /api/events/:eventId/tickets`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `GET /api/orders/my-tickets`
-- `GET /api/tickets/my`
-- `POST /api/orders`
+## Admin navigation
 
-### Admin
+The admin interface is split into pages for:
+Overview, Users, Suspended Users, Events, All Tickets, Available Tickets, All Orders,
+Paid Orders, Revenue, Giveaways, Create Event, Create Giveaway and Support.
 
-- `GET /api/admin/stats`
-- `GET /api/admin/users`
-- `GET /api/admin/users/suspended`
-- `GET /api/admin/events`
-- `GET /api/admin/tickets`
-- `GET /api/admin/tickets/available`
-- `GET /api/admin/orders`
-- `GET /api/admin/orders/paid`
-- `GET /api/admin/revenue`
-- `GET /api/admin/giveaways`
-- `POST /api/admin/events`
-- `PATCH /api/admin/events/:id`
-- `DELETE /api/admin/events/:id`
-- `PATCH /api/admin/tickets/:id`
-- `DELETE /api/admin/tickets/:id`
-- `POST /api/admin/giveaways`
-- `POST /api/admin/tickets/:id/give`
-- `PATCH /api/admin/users/:id/suspend`
-
-Your existing backend may use different names. In that case update only `assets/js/admin.js` and `assets/js/app.js` endpoint arrays.
-
-## 5. Gallery images
-
-Admin event creation does not ask for an image URL.
-
-The admin selects an image from the phone/computer gallery. The frontend:
-
-1. reads the local image;
-2. resizes it;
-3. compresses it;
-4. sends it to the backend as `image`.
-
-The backend should store it permanently (for example as a base64 field for a small prototype or, preferably, in object storage and save the resulting file reference).
-
-## 6. Email
-
-Admin giveaway does not depend on email delivery.
-
-A giveaway should directly change the ticket's `owner/userId` in the database and make it appear in that user's My Tickets.
-
-Email can be added separately as a notification, but email must never be the thing that creates or transfers ownership.
-
-## 7. Render free plan
-
-Render's free service can sleep after inactivity. The first request can therefore be slow.
-
-This does not mean the database should be deleted. If records are actually disappearing, verify the database connection and whether the backend is using an ephemeral/local database instead of persistent MongoDB.
-
-## 8. Test checklist
-
-1. Create a test account.
-2. Refresh the browser.
-3. Log out and log back in.
-4. Create an event in admin.
-5. Upload an image from gallery.
-6. Refresh admin.
-7. Open the public Discover page.
-8. Confirm the event remains.
-9. Create/add a ticket.
-10. Buy or assign the ticket.
-11. Open My Tickets.
-12. Open the ticket and confirm barcode, section, row, seat and order number.
-13. Refresh again.
-14. Log in from another device/browser and confirm the same server-side record exists.
-15. Give a ticket to an existing account and confirm it appears directly in that user's My Tickets.
-
-If step 13 or 14 loses data, fix the backend/database rather than adding more localStorage.
+Create Giveaway is intentionally separate from Create Event.

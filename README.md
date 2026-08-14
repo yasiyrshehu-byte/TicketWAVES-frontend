@@ -1,32 +1,22 @@
-# TicketWAVES Full Frontend Update
+# TicketWAVES Frontend V2
 
-This package replaces the previous frontend with a mobile-first marketplace UI and a separate admin control centre.
+This version fixes the most visible deployment problem from the previous ZIP: raw/un-styled
+HTML caused by CSS assets not being served.
 
-## Included
+The user app has:
+- Discover
+- For You
+- My Tickets
+- Sell
+- Account
+- Account notifications, location, country, favourites, edit details, security and orders
+- Event search and event cards
+- Ticket details with barcode/ticket code
+- Transfer UI
+- Gallery image upload support through the admin forms
 
-For easiest GitHub Pages deployment, the site files are also copied at the ZIP root (`index.html`, `admin.html`, `assets/`). You can publish the ZIP root directly.
+The admin app has separate pages for users, suspended users, events, tickets, available tickets,
+orders, paid orders, revenue, giveaways, event creation and giveaway creation.
 
-- `frontend/index.html` — public TicketWAVES app
-- `frontend/admin.html` — admin app
-- `frontend/assets/js/config.js` — Render API URL
-- `frontend/assets/js/api.js` — API/auth/cache layer
-- `frontend/assets/js/app.js` — user experience
-- `frontend/assets/js/admin.js` — admin pages and CRUD actions
-- `frontend/assets/css/app.css` — public design
-- `frontend/assets/css/admin.css` — admin design
-- `DEPLOYMENT.md` — GitHub Pages + Render deployment notes
-- `backend-integration/README.md` — persistence and ticket ownership requirements
-
-## Design
-
-The public app uses the requested navigation:
-
-Discover | For You | My Tickets | Sell | Account
-
-The Account page contains notifications, location, favourites, edit details, security, orders and logout.
-
-The admin app has separate pages for users, suspended users, events, tickets, available tickets, orders, paid orders, revenue, giveaways, create event, create giveaway and support.
-
-## Critical persistence note
-
-A static GitHub Pages frontend cannot permanently save user accounts or tickets. The Render backend and persistent database must do that. This frontend never treats localStorage as the permanent database.
+This is a frontend package. Permanent data persistence still belongs to the Render backend and
+MongoDB.
