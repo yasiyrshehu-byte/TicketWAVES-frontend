@@ -1,23 +1,23 @@
-// =====================================================
-// TicketWAVES ADMIN.JS
-// Manual event + ticket system
-// =====================================================
+/* =========================================================
+   TICKETWAVES ADMIN.JS
+   Manual event + ticket management
+   ========================================================= */
 
 let manualTickets = [];
 
 
-// =====================================================
-// ADMIN PAGE START
-// =====================================================
+/* =========================================================
+   ADMIN LOGIN
+   ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
   const loginForm = $("loginForm");
   const dashboard = $("adminDashboard");
 
-  // -------------------------
-  // ADMIN LOGIN
-  // -------------------------
+  /* -------------------------
+     ADMIN LOGIN
+  ------------------------- */
 
   if (loginForm) {
 
@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       e.preventDefault();
 
-      const button = loginForm.querySelector("button");
+      const form = e.currentTarget;
+      const button = form.querySelector("button");
 
       if (button) {
         button.disabled = true;
@@ -36,6 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await api("/auth/login", {
           method: "POST",
 
+          headers: {
+            "Content-Type": "application/json"
+          },
+
           body: JSON.stringify({
             email: $("email").value.trim().toLowerCase(),
             password: $("password").value
@@ -43,12 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-        if (response.user?.role !== "admin") {
+        if (!response.user) {
+          throw new Error("Login failed.");
+        }
 
+
+        if (response.user.role !== "admin") {
           throw new Error(
             "This account does not have administrator access."
           );
-
         }
 
 
@@ -68,11 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       } catch (error) {
 
+        console.error("ADMIN LOGIN:", error);
+
         showMessage(
           $("msg"),
           error.message || "Login failed.",
           "error"
         );
+
+      } finally {
 
         if (button) {
           button.disabled = false;
@@ -86,9 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // -------------------------
-  // CHECK ADMIN
-  // -------------------------
+  /* -------------------------
+     ADMIN DASHBOARD
+  ------------------------- */
 
   if (dashboard) {
 
@@ -111,87 +123,51 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-  }
+
+    /*
+      Create Ticket 1 automatically
+    */
+    manualTickets = [
+      {
+        section: "",
+        row: "",
+        seat: "",
+        price: ""
+      }
+    ];
 
 
-  // -------------------------
-  // CREATE FIRST TICKET
-  // -------------------------
+    renderManualTickets();
 
-  manualTickets = [
-    {
-      section: "",
-      row: "",
-      seat: "",
-      price: ""
+
+    /*
+      Make + Add Ticket work
+    */
+    const addTicketButton = $("addTicketBtn");
+
+    if (addTicketButton) {
+
+      addTicketButton.addEventListener(
+        "click",
+        addTicket
+      );
+
     }
-  ];
 
 
-  renderManualTickets();
-
-
-  // -------------------------
-  // ADD TICKET BUTTON
-  // -------------------------
-
-  const addTicketButton = $("addTicketBtn");
-
-  if (addTicketButton) {
-
-    addTicketButton.addEventListener(
-      "click",
-      addTicket
-    );
+    /*
+      Load admin information
+    */
+    loadAdmin();
 
   }
-
-
-  // -------------------------
-  // CREATE EVENT FORM
-  // -------------------------
-
-  const eventForm = $("eventForm");
-
-  if (eventForm) {
-
-    eventForm.addEventListener(
-      "submit",
-      createEvent
-    );
-
-  }
-
-
-  // -------------------------
-  // GIVEAWAY FORM
-  // -------------------------
-
-  const freeForm = $("freeForm");
-
-  if (freeForm) {
-
-    freeForm.addEventListener(
-      "submit",
-      giveAwayTicket
-    );
-
-  }
-
-
-  // -------------------------
-  // LOAD ADMIN
-  // -------------------------
-
-  loadAdmin();
 
 });
 
 
-
-// =====================================================
-// LOAD ADMIN DATA
-// =====================================================
+/* =========================================================
+   LOAD ADMIN DATA
+   ========================================================= */
 
 async function loadAdmin() {
 
@@ -199,7 +175,7 @@ async function loadAdmin() {
 
     const results = await Promise.all([
       api("/admin/stats"),
-      api("/admin/events"),
+      api("/events"),
       api("/admin/free-ticket-options"),
       api("/admin/support")
     ]);
@@ -207,13 +183,13 @@ async function loadAdmin() {
 
     const stats = results[0];
     const events = results[1];
-    const free = results[2];
+    const freeTickets = results[2];
     const support = results[3];
 
 
-    // =================================================
-    // STATS
-    // =================================================
+    /* -------------------------
+       STATS
+    ------------------------- */
 
     if ($("stats")) {
 
@@ -234,25 +210,15 @@ async function loadAdmin() {
     }
 
 
-    // =================================================
-    // EVENTS
-    // =================================================
+    /* -------------------------
+       EVENTS
+    ------------------------- */
 
     if ($("eventList")) {
 
-      const eventArray =
-        events.events || [];
-
-
-      if (!eventArray.length) {
-
-        $("eventList").innerHTML =
-          "<p>No events.</p>";
-
-      } else {
-
-        $("eventList").innerHTML =
-          eventArray.map(event => {
+      $("eventList").innerHTML =
+        (events.events || [])
+          .map((event) => {
 
             return `
               <div class="admin-row">
@@ -263,97 +229,96 @@ async function loadAdmin() {
 
                 <br>
 
-                ${esc(event.artist || "")}
+                ${esc(event.date || "")}
+
+                ${event.time
+                  ? ` · ${esc(event.time)}`
+                  : ""
+                }
 
                 <br>
 
-                ${esc(event.date)}
-                ·
-                ${esc(event.time || "")}
+                ${esc(event.venue || "")}
 
-                <br>
-
-                ${esc(event.venue || "")},
-                ${esc(event.city || "")},
-                ${esc(event.country || "")}
+                ${event.city
+                  ? `, ${esc(event.city)}`
+                  : ""
+                }
 
                 <br>
 
                 <span>
                   ${Number(event.availableSeats || 0)}
-                  available tickets
+                  available
                 </span>
 
               </div>
             `;
 
-          }).join("");
-
-      }
+          })
+          .join("") || "<p>No events.</p>";
 
     }
 
 
-    // =================================================
-    // GIVEAWAY OPTIONS
-    // =================================================
+    /* -------------------------
+       GIVEAWAY TICKETS
+    ------------------------- */
 
     if ($("freeTicket")) {
 
       const options =
-        free.options || [];
+        freeTickets.options || [];
 
 
       if (!options.length) {
 
-        $("freeTicket").innerHTML = `
+        $("freeTicket").innerHTML =
+          `
           <option value="">
             No available tickets
           </option>
-        `;
+          `;
 
       } else {
 
-        $("freeTicket").innerHTML = `
+        $("freeTicket").innerHTML =
+          `
           <option value="">
             Select a ticket…
           </option>
+          ` +
 
-          ${
-            options.map(ticket => `
-              <option value="${esc(ticket.id)}">
-                ${esc(ticket.label)}
-                · ${esc(ticket.currency)}
-                ${esc(ticket.price)}
-              </option>
-            `).join("")
-          }
-        `;
+          options
+            .map((ticket) => {
+
+              return `
+                <option value="${esc(ticket.id)}">
+                  ${esc(ticket.label)}
+                  ${ticket.price != null
+                    ? ` — ${esc(ticket.currency || "")} ${esc(ticket.price)}`
+                    : ""
+                  }
+                </option>
+              `;
+
+            })
+            .join("");
 
       }
 
     }
 
 
-    // =================================================
-    // SUPPORT
-    // =================================================
+    /* -------------------------
+       SUPPORT
+    ------------------------- */
 
     if ($("supportList")) {
 
-      const messages =
-        support.messages || [];
-
-
-      if (!messages.length) {
-
-        $("supportList").innerHTML =
-          "<p>No support messages.</p>";
-
-      } else {
-
-        $("supportList").innerHTML =
-          messages.map(message => {
+      $("supportList").innerHTML =
+        (support.messages || [])
+          .map((message) => {
 
             return `
               <div class="admin-row">
@@ -379,30 +344,39 @@ async function loadAdmin() {
               </div>
             `;
 
-          }).join("");
-
-      }
+          })
+          .join("") || "<p>No support messages.</p>";
 
     }
 
 
   } catch (error) {
 
-    showMessage(
-      $("adminMsg"),
-      error.message || "Unable to load admin data.",
-      "error"
+    console.error(
+      "LOAD ADMIN:",
+      error
     );
+
+
+    if ($("adminMsg")) {
+
+      showMessage(
+        $("adminMsg"),
+        error.message ||
+          "Unable to load admin information.",
+        "error"
+      );
+
+    }
 
   }
 
 }
 
 
-
-// =====================================================
-// RENDER MANUAL TICKETS
-// =====================================================
+/* =========================================================
+   MANUAL TICKET RENDERER
+   ========================================================= */
 
 function renderManualTickets() {
 
@@ -416,145 +390,154 @@ function renderManualTickets() {
   container.innerHTML = "";
 
 
-  manualTickets.forEach((ticket, index) => {
+  manualTickets.forEach(
+    (ticket, index) => {
 
-    const row =
-      document.createElement("div");
-
-
-    row.className =
-      "ticket-row";
+      const wrapper =
+        document.createElement("div");
 
 
-    row.innerHTML = `
+      wrapper.className =
+        "ticket-row";
 
-      <div class="ticket-row-header">
 
-        <strong>
-          Ticket ${index + 1}
-        </strong>
+      wrapper.innerHTML = `
 
-        ${
-          index > 0
-          ? `
-            <button
-              type="button"
-              class="remove-ticket"
-              data-remove="${index}"
+        <div class="ticket-row-header">
+
+          <strong>
+            Ticket ${index + 1}
+          </strong>
+
+          ${
+            manualTickets.length > 1
+              ? `
+                <button
+                  type="button"
+                  class="remove-ticket"
+                  data-remove-ticket="${index}"
+                >
+                  Remove
+                </button>
+              `
+              : ""
+          }
+
+        </div>
+
+
+        <div class="ticket-fields">
+
+
+          <!-- SECTION -->
+
+          <div class="field">
+
+            <label>
+              Section
+            </label>
+
+            <input
+              type="text"
+              class="ticket-section"
+              data-index="${index}"
+              value="${esc(ticket.section)}"
+              placeholder="e.g. 110"
             >
-              Remove
-            </button>
-          `
-          : ""
-        }
 
-      </div>
+          </div>
 
 
-      <div class="ticket-fields">
+          <!-- ROW -->
+
+          <div class="field">
+
+            <label>
+              Row
+            </label>
+
+            <input
+              type="text"
+              class="ticket-row-input"
+              data-index="${index}"
+              value="${esc(ticket.row)}"
+              placeholder="e.g. 24"
+            >
+
+          </div>
 
 
-        <div class="field">
+          <!-- SEAT -->
 
-          <label>
-            Section
-          </label>
+          <div class="field">
 
-          <input
-            type="text"
-            class="ticket-section"
-            data-index="${index}"
-            value="${esc(ticket.section)}"
-            placeholder="e.g. 110"
-          >
+            <label>
+              Seat
+            </label>
+
+            <input
+              type="text"
+              class="ticket-seat"
+              data-index="${index}"
+              value="${esc(ticket.seat)}"
+              placeholder="e.g. 14"
+            >
+
+          </div>
+
+
+          <!-- PRICE -->
+
+          <div class="field">
+
+            <label>
+              Price
+            </label>
+
+            <input
+              type="number"
+              class="ticket-price"
+              data-index="${index}"
+              value="${esc(ticket.price)}"
+              min="0"
+              step="0.01"
+              placeholder="100"
+            >
+
+          </div>
+
 
         </div>
 
-
-        <div class="field">
-
-          <label>
-            Row
-          </label>
-
-          <input
-            type="text"
-            class="ticket-row-input"
-            data-index="${index}"
-            value="${esc(ticket.row)}"
-            placeholder="e.g. 24"
-          >
-
-        </div>
+      `;
 
 
-        <div class="field">
+      container.appendChild(wrapper);
 
-          <label>
-            Seat
-          </label>
-
-          <input
-            type="text"
-            class="ticket-seat"
-            data-index="${index}"
-            value="${esc(ticket.seat)}"
-            placeholder="e.g. 14"
-          >
-
-        </div>
+    }
+  );
 
 
-        <div class="field">
-
-          <label>
-            Price
-          </label>
-
-          <input
-            type="number"
-            class="ticket-price"
-            data-index="${index}"
-            value="${esc(ticket.price)}"
-            min="0"
-            step="0.01"
-            placeholder="100"
-          >
-
-        </div>
-
-
-      </div>
-
-    `;
-
-
-    container.appendChild(row);
-
-  });
-
-
-  // -------------------------
-  // REMOVE BUTTONS
-  // -------------------------
+  /*
+    Remove ticket buttons
+  */
 
   container
-    .querySelectorAll("[data-remove]")
-    .forEach(button => {
+    .querySelectorAll(
+      "[data-remove-ticket]"
+    )
+    .forEach((button) => {
 
       button.addEventListener(
         "click",
         () => {
 
           const index =
-            Number(button.dataset.remove);
+            Number(
+              button.dataset.removeTicket
+            );
 
-          manualTickets.splice(
-            index,
-            1
-          );
-
-          renderManualTickets();
+          removeTicket(index);
 
         }
       );
@@ -564,12 +547,19 @@ function renderManualTickets() {
 }
 
 
-
-// =====================================================
-// ADD TICKET
-// =====================================================
+/* =========================================================
+   ADD TICKET
+   ========================================================= */
 
 function addTicket() {
+
+  /*
+    Save what is currently typed
+    before adding another ticket.
+  */
+
+  saveTicketInputs();
+
 
   manualTickets.push({
 
@@ -602,40 +592,102 @@ function addTicket() {
 
     }
 
-  }, 100);
+  }, 50);
 
 }
 
 
+/* =========================================================
+   SAVE INPUTS
+   ========================================================= */
 
-// =====================================================
-// COLLECT TICKETS
-// =====================================================
-
-function collectTickets() {
+function saveTicketInputs() {
 
   const sections =
     document.querySelectorAll(
       ".ticket-section"
     );
 
-
   const rows =
     document.querySelectorAll(
       ".ticket-row-input"
     );
-
 
   const seats =
     document.querySelectorAll(
       ".ticket-seat"
     );
 
-
   const prices =
     document.querySelectorAll(
       ".ticket-price"
     );
+
+
+  manualTickets =
+    manualTickets.map(
+      (ticket, index) => {
+
+        return {
+
+          section:
+            sections[index]?.value.trim()
+            || "",
+
+          row:
+            rows[index]?.value.trim()
+            || "",
+
+          seat:
+            seats[index]?.value.trim()
+            || "",
+
+          price:
+            prices[index]?.value.trim()
+            || ""
+
+        };
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   REMOVE TICKET
+   ========================================================= */
+
+function removeTicket(index) {
+
+  saveTicketInputs();
+
+
+  if (manualTickets.length <= 1) {
+
+    return;
+
+  }
+
+
+  manualTickets.splice(
+    index,
+    1
+  );
+
+
+  renderManualTickets();
+
+}
+
+
+/* =========================================================
+   COLLECT TICKETS
+   ========================================================= */
+
+function collectTickets() {
+
+  saveTicketInputs();
 
 
   const tickets = [];
@@ -647,27 +699,15 @@ function collectTickets() {
     i++
   ) {
 
-    const section =
-      sections[i]?.value.trim() || "";
-
-
-    const row =
-      rows[i]?.value.trim() || "";
-
-
-    const seat =
-      seats[i]?.value.trim() || "";
-
-
-    const price =
-      prices[i]?.value.trim() || "";
+    const ticket =
+      manualTickets[i];
 
 
     if (
-      !section ||
-      !row ||
-      !seat ||
-      !price
+      !ticket.section ||
+      !ticket.row ||
+      !ticket.seat ||
+      ticket.price === ""
     ) {
 
       throw new Error(
@@ -677,13 +717,13 @@ function collectTickets() {
     }
 
 
-    const numericPrice =
-      Number(price);
+    const price =
+      Number(ticket.price);
 
 
     if (
-      !Number.isFinite(numericPrice) ||
-      numericPrice < 0
+      !Number.isFinite(price) ||
+      price < 0
     ) {
 
       throw new Error(
@@ -695,10 +735,23 @@ function collectTickets() {
 
     tickets.push({
 
-      section,
-      row,
-      seat,
-      price: numericPrice
+      section:
+        ticket.section,
+
+      row:
+        ticket.row,
+
+      seat:
+        ticket.seat,
+
+      price:
+        price,
+
+      currency:
+        $("currency")?.value
+          .trim()
+          .toUpperCase()
+          || "NGN"
 
     });
 
@@ -719,333 +772,557 @@ function collectTickets() {
 }
 
 
+/* =========================================================
+   CREATE EVENT
+   ========================================================= */
 
-// =====================================================
-// CREATE EVENT
-// =====================================================
+$("eventForm")?.addEventListener(
+  "submit",
+  async (e) => {
 
-async function createEvent(e) {
-
-  e.preventDefault();
-
-
-  const button =
-    e.currentTarget.querySelector(
-      "button[type='submit']"
-    );
+    e.preventDefault();
 
 
-  if (button) {
+    /*
+      IMPORTANT:
+      Save the form BEFORE await.
+      This fixes:
 
-    button.disabled = true;
-    button.textContent =
-      "Creating Event...";
+      null is not an object
+      evaluating 'e.currentTarget.reset'
+    */
 
-  }
-
-
-  try {
-
-    const tickets =
-      collectTickets();
+    const form =
+      e.currentTarget;
 
 
-    const title =
-      $("title")?.value.trim() || "";
-
-
-    const artist =
-      $("artist")?.value.trim() || "";
-
-
-    const date =
-      $("date")?.value || "";
-
-
-    const time =
-      $("time")?.value || "";
-
-
-    const venue =
-      $("venue")?.value.trim() || "";
-
-
-    const city =
-      $("city")?.value.trim() || "";
-
-
-    const country =
-      $("country")?.value.trim() || "";
-
-
-    const currency =
-      $("currency")?.value
-        .trim()
-        .toUpperCase() || "NGN";
-
-
-    const image =
-      $("image")?.value.trim() || "";
-
-
-    const description =
-      $("description")?.value.trim() || "";
-
-
-    // -------------------------
-    // VALIDATION
-    // -------------------------
-
-    if (!title) {
-      throw new Error(
-        "Please enter the event title."
-      );
-    }
-
-
-    if (!date) {
-      throw new Error(
-        "Please select the event date."
-      );
-    }
-
-
-    if (!time) {
-      throw new Error(
-        "Please select the event time."
-      );
-    }
-
-
-    if (!venue) {
-      throw new Error(
-        "Please enter the venue."
-      );
-    }
-
-
-    if (!city) {
-      throw new Error(
-        "Please enter the city."
-      );
-    }
-
-
-    if (!country) {
-      throw new Error(
-        "Please enter the country."
-      );
-    }
-
-
-    // -------------------------
-    // SEND EVENT
-    // -------------------------
-
-    const response =
-      await api(
-        "/admin/events",
-        {
-
-          method: "POST",
-
-          body: JSON.stringify({
-
-            title,
-            artist,
-            date,
-            time,
-
-            venue,
-            city,
-            country,
-
-            currency,
-
-            image,
-
-            description,
-
-            tickets
-
-          })
-
-        }
+    const button =
+      form.querySelector(
+        "button[type='submit']"
       );
 
-
-    showMessage(
-      $("eventMsg"),
-      response.message ||
-        "Event created successfully!",
-      "success"
-    );
-
-
-    // -------------------------
-    // RESET
-    // -------------------------
-
-    e.currentTarget.reset();
-
-
-    if ($("currency")) {
-
-      $("currency").value =
-        "NGN";
-
-    }
-
-
-    manualTickets = [
-
-      {
-        section: "",
-        row: "",
-        seat: "",
-        price: ""
-      }
-
-    ];
-
-
-    renderManualTickets();
-
-
-    // -------------------------
-    // RELOAD ADMIN
-    // -------------------------
-
-    await loadAdmin();
-
-
-  } catch (error) {
-
-    showMessage(
-      $("eventMsg"),
-      error.message ||
-        "Event creation failed.",
-      "error"
-    );
-
-  } finally {
 
     if (button) {
 
-      button.disabled = false;
+      button.disabled = true;
 
       button.textContent =
-        "Create Event";
-
-    }
-
-  }
-
-}
-
-
-
-// =====================================================
-// GIVE AWAY TICKET
-// =====================================================
-
-async function giveAwayTicket(e) {
-
-  e.preventDefault();
-
-
-  const button =
-    e.currentTarget.querySelector(
-      "button[type='submit']"
-    );
-
-
-  if (button) {
-    button.disabled = true;
-  }
-
-
-  try {
-
-    const email =
-      $("freeEmail")
-        ?.value
-        .trim()
-        .toLowerCase();
-
-
-    const ticketId =
-      Number(
-        $("freeTicket")?.value
-      );
-
-
-    if (!email) {
-
-      throw new Error(
-        "Please enter the recipient's email."
-      );
+        "Creating Event...";
 
     }
 
 
-    if (!ticketId) {
+    try {
 
-      throw new Error(
-        "Please select a ticket."
+      /*
+        Collect manual tickets
+      */
+
+      const tickets =
+        collectTickets();
+
+
+      /*
+        Event information
+      */
+
+      const title =
+        $("title")?.value.trim()
+        || "";
+
+      const artist =
+        $("artist")?.value.trim()
+        || "";
+
+      const date =
+        $("date")?.value
+        || "";
+
+      const time =
+        $("time")?.value
+        || "";
+
+      const venue =
+        $("venue")?.value.trim()
+        || "";
+
+      const city =
+        $("city")?.value.trim()
+        || "";
+
+      const country =
+        $("country")?.value.trim()
+        || "";
+
+      const currency =
+        $("currency")?.value
+          .trim()
+          .toUpperCase()
+        || "NGN";
+
+      const image =
+        $("image")?.value.trim()
+        || "";
+
+      const description =
+        $("description")?.value.trim()
+        || "";
+
+
+      /* -------------------------
+         VALIDATION
+      ------------------------- */
+
+      if (!title) {
+
+        throw new Error(
+          "Please enter the event title."
+        );
+
+      }
+
+
+      if (!date) {
+
+        throw new Error(
+          "Please select the event date."
+        );
+
+      }
+
+
+      if (!time) {
+
+        throw new Error(
+          "Please select the event time."
+        );
+
+      }
+
+
+      if (!venue) {
+
+        throw new Error(
+          "Please enter the venue."
+        );
+
+      }
+
+
+      if (!city) {
+
+        throw new Error(
+          "Please enter the city."
+        );
+
+      }
+
+
+      if (!country) {
+
+        throw new Error(
+          "Please enter the country."
+        );
+
+      }
+
+
+      /* =================================================
+         STEP 1
+         CREATE VENUE AUTOMATICALLY
+         ================================================= */
+
+      const seatData =
+        tickets.map((ticket) => ({
+
+          section:
+            ticket.section,
+
+          row:
+            ticket.row,
+
+          seat:
+            ticket.seat,
+
+          price:
+            ticket.price,
+
+          currency:
+            currency
+
+        }));
+
+
+      /*
+        The existing backend /admin/venues
+        expects multipart/form-data.
+      */
+
+      const venueForm =
+        new FormData();
+
+
+      venueForm.append(
+        "name",
+        venue
       );
 
-    }
+
+      venueForm.append(
+        "city",
+        city
+      );
 
 
-    const response =
-      await api(
-        "/admin/free-ticket",
+      venueForm.append(
+        "country",
+        country
+      );
+
+
+      venueForm.append(
+        "address",
+        ""
+      );
+
+
+      venueForm.append(
+        "seatData",
+        JSON.stringify(seatData)
+      );
+
+
+      /*
+        Do NOT manually set Content-Type here.
+        Browser adds the multipart boundary.
+      */
+
+      const venueResponse =
+        await api(
+          "/admin/venues",
+          {
+            method: "POST",
+            body: venueForm
+          }
+        );
+
+
+      if (
+        !venueResponse ||
+        !venueResponse.venueId
+      ) {
+
+        throw new Error(
+          venueResponse?.message ||
+          "Unable to create venue."
+        );
+
+      }
+
+
+      const venueId =
+        venueResponse.venueId;
+
+
+      /* =================================================
+         STEP 2
+         CREATE EVENT
+         ================================================= */
+
+      const eventResponse =
+        await api(
+          "/admin/events",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              venueId:
+
+                Number(venueId),
+
+              title:
+
+                title,
+
+              artist:
+
+                artist,
+
+              date:
+
+                date,
+
+              time:
+
+                time,
+
+              currency:
+
+                currency,
+
+              image:
+
+                image,
+
+              description:
+
+                description
+
+            })
+
+          }
+        );
+
+
+      if (
+        !eventResponse ||
+        eventResponse.success === false
+      ) {
+
+        throw new Error(
+          eventResponse?.message ||
+          "Event creation failed."
+        );
+
+      }
+
+
+      /* =================================================
+         SUCCESS
+         ================================================= */
+
+      showMessage(
+        $("eventMsg"),
+        eventResponse.message ||
+          "Event created successfully!",
+        "success"
+      );
+
+
+      /*
+        Reset the saved form reference.
+        NOT e.currentTarget.reset()
+      */
+
+      form.reset();
+
+
+      /*
+        Reset tickets
+      */
+
+      manualTickets = [
         {
-
-          method: "POST",
-
-          body: JSON.stringify({
-
-            userEmail: email,
-
-            ticketId
-
-          })
-
+          section: "",
+          row: "",
+          seat: "",
+          price: ""
         }
+      ];
+
+
+      renderManualTickets();
+
+
+      /*
+        Restore currency
+      */
+
+      if ($("currency")) {
+
+        $("currency").value =
+          "NGN";
+
+      }
+
+
+      /*
+        Refresh admin dashboard
+      */
+
+      await loadAdmin();
+
+
+    } catch (error) {
+
+      console.error(
+        "CREATE EVENT ERROR:",
+        error
       );
 
 
-    showMessage(
-      $("freeMsg"),
-      response.message ||
-        "Free ticket issued successfully.",
-      "success"
-    );
+      showMessage(
+        $("eventMsg"),
+        error.message ||
+          "Unable to create event.",
+        "error"
+      );
 
 
-    $("freeEmail").value = "";
+    } finally {
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Create Event";
+
+      }
+
+    }
+
+  }
+);
 
 
-    await loadAdmin();
+/* =========================================================
+   ADMIN GIVEAWAY
+   ========================================================= */
+
+$("freeForm")?.addEventListener(
+  "submit",
+  async (e) => {
+
+    e.preventDefault();
 
 
-  } catch (error) {
+    const form =
+      e.currentTarget;
 
-    showMessage(
-      $("freeMsg"),
-      error.message ||
-        "Unable to issue free ticket.",
-      "error"
-    );
 
-  } finally {
+    const button =
+      form.querySelector(
+        "button[type='submit']"
+      );
+
 
     if (button) {
-      button.disabled = false;
+
+      button.disabled = true;
+
+      button.textContent =
+        "Giving Away...";
+
+    }
+
+
+    try {
+
+      const email =
+        $("freeEmail")
+          ?.value
+          .trim()
+          .toLowerCase()
+        || "";
+
+
+      const ticketId =
+        Number(
+          $("freeTicket")?.value
+        );
+
+
+      if (!email) {
+
+        throw new Error(
+          "Please enter the recipient account email."
+        );
+
+      }
+
+
+      if (!ticketId) {
+
+        throw new Error(
+          "Please select a ticket."
+        );
+
+      }
+
+
+      const response =
+        await api(
+          "/admin/free-ticket",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              userEmail:
+                email,
+
+              ticketId:
+                ticketId
+
+            })
+
+          }
+        );
+
+
+      showMessage(
+        $("freeMsg"),
+        response.message ||
+          "Free ticket issued successfully.",
+        "success"
+      );
+
+
+      /*
+        Clear recipient email
+      */
+
+      $("freeEmail").value =
+        "";
+
+
+      /*
+        Reload available tickets
+      */
+
+      await loadAdmin();
+
+
+    } catch (error) {
+
+      console.error(
+        "FREE TICKET ERROR:",
+        error
+      );
+
+
+      showMessage(
+        $("freeMsg"),
+        error.message ||
+          "Unable to give away ticket.",
+        "error"
+      );
+
+
+    } finally {
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Give Away Ticket";
+
+      }
+
     }
 
   }
-
-}
+);
