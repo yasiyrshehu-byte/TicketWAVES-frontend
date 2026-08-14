@@ -1065,15 +1065,284 @@ $("eventForm")?.addEventListener(
         );
 
 
-      /* ===================================================
-         CREATE EVENT
-         =================================================== */
+      /* /* =========================================================
+   CREATE EVENT
+   ========================================================= */
+
+const eventForm = document.getElementById("eventForm");
+
+if (eventForm) {
+
+  eventForm.addEventListener("submit", async function (e) {
+
+    e.preventDefault();
+
+    const form = e.currentTarget;
+
+    const button = form.querySelector(
+      "button[type='submit']"
+    );
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Creating Event...";
+    }
+
+    try {
+
+      /* ================================================
+         GET VALUES DIRECTLY FROM THE FORM
+         ================================================ */
+
+      const titleElement =
+        document.getElementById("title");
+
+      const artistElement =
+        document.getElementById("artist");
+
+      const dateElement =
+        document.getElementById("date");
+
+      const timeElement =
+        document.getElementById("time");
+
+      const venueElement =
+        document.getElementById("venue");
+
+      const cityElement =
+        document.getElementById("city");
+
+      const countryElement =
+        document.getElementById("country");
+
+      const currencyElement =
+        document.getElementById("currency");
+
+      const imageElement =
+        document.getElementById("image");
+
+      const descriptionElement =
+        document.getElementById("description");
+
+
+      /* ================================================
+         CHECK THAT THE HTML ELEMENTS ACTUALLY EXIST
+         ================================================ */
+
+      if (!titleElement) {
+        throw new Error(
+          "Event title field was not found."
+        );
+      }
+
+      if (!dateElement) {
+        throw new Error(
+          "Event date field was not found."
+        );
+      }
+
+      if (!timeElement) {
+        throw new Error(
+          "Event time field was not found."
+        );
+      }
+
+      if (!venueElement) {
+        throw new Error(
+          "Venue field was not found. Please update admin.html."
+        );
+      }
+
+      if (!cityElement) {
+        throw new Error(
+          "City field was not found. Please update admin.html."
+        );
+      }
+
+      if (!countryElement) {
+        throw new Error(
+          "Country field was not found. Please update admin.html."
+        );
+      }
+
+
+      /* ================================================
+         READ VALUES
+         ================================================ */
+
+      const title =
+        titleElement.value.trim();
+
+      const artist =
+        artistElement
+          ? artistElement.value.trim()
+          : "";
+
+      const date =
+        dateElement.value;
+
+      const time =
+        timeElement.value;
+
+      const venue =
+        venueElement.value.trim();
+
+      const city =
+        cityElement.value.trim();
+
+      const country =
+        countryElement.value.trim();
+
+      const currency =
+        currencyElement
+          ? (
+              currencyElement.value.trim()
+              .toUpperCase()
+            || "NGN")
+          : "NGN";
+
+      const image =
+        imageElement
+          ? imageElement.value.trim()
+          : "";
+
+      const description =
+        descriptionElement
+          ? descriptionElement.value.trim()
+          : "";
+
+
+      /* ================================================
+         VALIDATION
+         ================================================ */
+
+      if (!title) {
+        throw new Error(
+          "Please enter the event title."
+        );
+      }
+
+      if (!date) {
+        throw new Error(
+          "Please select the event date."
+        );
+      }
+
+      if (!time) {
+        throw new Error(
+          "Please select the event time."
+        );
+      }
+
+      if (!venue) {
+        throw new Error(
+          "Please enter the venue name."
+        );
+      }
+
+      if (!city) {
+        throw new Error(
+          "Please enter the city."
+        );
+      }
+
+      if (!country) {
+        throw new Error(
+          "Please enter the country."
+        );
+      }
+
+
+      /* ================================================
+         GET MANUAL TICKETS
+         ================================================ */
+
+      const tickets =
+        collectTickets();
+
+
+      if (!tickets.length) {
+        throw new Error(
+          "Please add at least one ticket."
+        );
+      }
+
+
+      /* ================================================
+         CONVERT MANUAL TICKETS TO SEAT DATA
+         ================================================ */
+
+      const seatData =
+        tickets.map(ticket => ({
+          section: ticket.section,
+          row: ticket.row,
+          seat: ticket.seat,
+          price: Number(ticket.price),
+          currency: currency
+        }));
+
+
+      /* ================================================
+         CREATE VENUE
+         ================================================ */
+
+      const venueForm =
+        new FormData();
+
+      venueForm.append(
+        "name",
+        venue
+      );
+
+      venueForm.append(
+        "city",
+        city
+      );
+
+      venueForm.append(
+        "country",
+        country
+      );
+
+      venueForm.append(
+        "address",
+        ""
+      );
+
+      venueForm.append(
+        "seatData",
+        JSON.stringify(seatData)
+      );
+
+
+      const venueResponse =
+        await apiForm(
+          "/admin/venues",
+          venueForm
+        );
+
+
+      if (
+        !venueResponse ||
+        !venueResponse.venueId
+      ) {
+
+        throw new Error(
+          venueResponse?.message ||
+          "Unable to create venue."
+        );
+
+      }
+
+
+      /* ================================================
+         CREATE EVENT USING NEW VENUE
+         ================================================ */
 
       const eventResponse =
         await api(
           "/admin/events",
           {
-
             method: "POST",
 
             headers: {
@@ -1081,38 +1350,42 @@ $("eventForm")?.addEventListener(
                 "application/json"
             },
 
-            body:
-              JSON.stringify({
+            body: JSON.stringify({
 
-                venueId:
-                  venueId,
+              venueId:
+                Number(
+                  venueResponse.venueId
+                ),
 
-                title:
-                  title,
+              title:
+                title,
 
-                artist:
-                  artist,
+              artist:
+                artist,
 
-                date:
-                  date,
+              date:
+                date,
 
-                time:
-                  time,
+              time:
+                time,
 
-                currency:
-                  currency,
+              currency:
+                currency,
 
-                image:
-                  image,
+              image:
+                image,
 
-                description:
-                  description
+              description:
+                description
 
-              })
-
+            })
           }
         );
 
+
+      /* ================================================
+         SUCCESS
+         ================================================ */
 
       if (
         !eventResponse ||
@@ -1127,7 +1400,74 @@ $("eventForm")?.addEventListener(
       }
 
 
-      /* ===================================================
+      showMessage(
+        document.getElementById("eventMsg"),
+        eventResponse.message ||
+          "Event created successfully!",
+        "success"
+      );
+
+
+      /* ================================================
+         RESET FORM
+         ================================================ */
+
+      form.reset();
+
+
+      manualTickets = [
+        {
+          section: "",
+          row: "",
+          seat: "",
+          price: ""
+        }
+      ];
+
+
+      renderManualTickets();
+
+
+      if (currencyElement) {
+        currencyElement.value = "NGN";
+      }
+
+
+      /* ================================================
+         REFRESH ADMIN DATA
+         ================================================ */
+
+      await loadAdmin();
+
+
+    } catch (error) {
+
+      console.error(
+        "CREATE EVENT ERROR:",
+        error
+      );
+
+      showMessage(
+        document.getElementById("eventMsg"),
+        error.message ||
+          "Server error.",
+        "error"
+      );
+
+
+    } finally {
+
+      if (button) {
+        button.disabled = false;
+        button.textContent =
+          "Create Event";
+      }
+
+    }
+
+  });
+
+} ===================================================
          SUCCESS
          =================================================== */
 
