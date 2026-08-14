@@ -1,31 +1,48 @@
-# TicketWAVES Frontend Update
+# TicketWAVES backend integration notes
 
-This is a mobile-first TicketWAVES marketplace frontend with:
+The frontend update is intentionally strict about persistence: it does not claim that a record is saved unless the backend accepts the request.
 
-- Discover
-- For You
-- My Tickets
-- Sell
-- Account
-- Working hash navigation (so GitHub Pages does not produce "Route not found")
-- Barcode rendering for ticket codes
-- Event cards and event detail modal
-- Account settings
-- Admin control centre with separate pages for users, suspended users, events, tickets, available tickets, orders, paid orders, revenue, giveaways, event creation and giveaway creation
-- Gallery image upload on admin event/giveaway forms
-- Ticket section/row/seat editing
-- Local cache that never replaces the backend as the source of truth
+## Ownership
 
-## API URL
+A ticket must have a server-side owner. A recommended ticket document contains:
 
-Edit `assets/js/config.js`:
+```text
+_id
+eventId
+ownerId
+orderId
+ticketCode
+quantity
+section
+row
+seat
+status
+price
+createdAt
+updatedAt
+```
 
-`API_BASE_URL: "https://ticketwaves-backend-3.onrender.com"`
+For an admin giveaway, the backend should atomically:
 
-Do not add `/api` to the URL. The app adds `/api` automatically.
+1. find the recipient account by email/id;
+2. verify the ticket is available;
+3. set `ownerId` to the recipient;
+4. set ticket status to `issued`/`owned`;
+5. record a giveaway/audit record;
+6. return the complete ticket.
 
-## Important
+Email is optional and must not be required for this operation.
 
-The browser cannot permanently store users, orders, tickets or revenue for every device. Those records must be saved by the Render backend/database. This frontend therefore treats the API as the source of truth.
+## Persistence
 
-If the backend returns an error, the UI will show it rather than silently pretending that a ticket was saved.
+Use a real persistent database (MongoDB Atlas is suitable for the existing Node/Express/Mongoose stack). Do not use an in-memory array or local JSON file on Render for production data.
+
+## Images
+
+For a small prototype, the frontend sends a compressed image data string or multipart `image` field. For production, use persistent object storage and save only the image reference in MongoDB.
+
+## Barcode
+
+The barcode is generated from the server-side ticket code. Never generate a new ticket identity on every page refresh.
+
+The backend should issue a unique immutable `ticketCode`.
