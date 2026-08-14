@@ -2,324 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#175cff">
-  <title>Admin | TicketWAVES</title>
-
-  <link rel="stylesheet" href="./admin.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10162f">
+  <title>TicketWAVES Admin</title>
+  <link rel="stylesheet" href="./assets/css/app.css">
+  <link rel="stylesheet" href="./assets/css/admin.css">
 </head>
-
-<body>
-
-<header class="admin-nav">
-  <b>TICKETWAVES ADMIN</b>
-
-  <nav>
-    <a href="#create">Create event</a>
-    <a href="#events">Events</a>
-    <a href="#tickets">Give Away Ticket</a>
-    <a href="#support">Support</a>
-
-    <button onclick="logout()">Logout</button>
-  </nav>
-</header>
-
-
-<main id="adminDashboard" class="admin-main">
-
-  <div id="stats" class="stats"></div>
-
-  <p id="adminMsg"></p>
-
-
-  <!-- =========================
-       CREATE EVENT
-  ========================== -->
-
-  <section id="create" class="admin-card">
-
-    <h2>Create Event</h2>
-
-    <p class="small">
-      Create an event and manually add the tickets you want to sell.
-      You do not need a CSV or JSON seat-data file.
-    </p>
-
-
-    <!-- EVENT DETAILS -->
-
-    <form id="eventForm" class="admin-form">
-
-      <h3>Event Details</h3>
-
-      <input
-        id="title"
-        placeholder="Event title"
-        required
-      >
-
-      <input
-        id="artist"
-        placeholder="Artist name"
-      >
-
-
-      <div class="two">
-
-        <input
-          id="date"
-          type="date"
-          required
-        >
-
-        <input
-          id="time"
-          type="time"
-          required
-        >
-
-      </div>
-
-
-      <input
-        id="venue"
-        placeholder="Venue name"
-        required
-      >
-
-
-      <input
-        id="city"
-        placeholder="City"
-        required
-      >
-
-
-      <input
-        id="country"
-        placeholder="Country"
-        required
-      >
-
-
-      <input
-        id="currency"
-        value="NGN"
-        placeholder="Currency"
-        required
-      >
-
-
-      <input
-        id="image"
-        placeholder="Licensed event image URL"
-      >
-
-
-      <textarea
-        id="description"
-        placeholder="Event description"
-        required
-      ></textarea>
-
-
-      <!-- =========================
-           MANUAL TICKETS
-      ========================== -->
-
-      <div class="ticket-builder">
-
-        <div class="ticket-builder-header">
-
-          <div>
-            <h3>Ticket Information</h3>
-
-            <p class="small">
-              Add the Section, Row, Seat and Price manually.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            id="addTicketBtn"
-            class="secondary"
-          >
-            + Add Ticket
-          </button>
-
-        </div>
-
-
-        <div id="ticketList">
-
-          <!-- Ticket 1 is created by JavaScript -->
-
-        </div>
-
-      </div>
-
-
-      <button
-        type="submit"
-        class="primary"
-      >
-        Create Event
-      </button>
-
-
-      <p id="eventMsg"></p>
-
-    </form>
-
-  </section>
-
-
-
-  <!-- =========================
-       EVENTS
-  ========================== -->
-
-  <section id="events" class="admin-card">
-
-    <h2>Events</h2>
-
-    <div id="eventList">
-      Loading…
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================
-       ADMIN GIVEAWAY
-  ========================== -->
-
-  <section id="tickets" class="admin-card">
-
-    <span class="eyebrow">
-      ADMIN GIVEAWAY
-    </span>
-
-    <h2>Give Away Ticket</h2>
-
-    <p class="small">
-      Give an available ticket directly to an existing
-      TicketWAVES account.
-    </p>
-
-    <p class="small">
-      <strong>
-        No email is sent for admin giveaways.
-      </strong>
-    </p>
-
-
-    <form
-      id="freeForm"
-      class="admin-form"
-    >
-
-      <input
-        id="freeEmail"
-        type="email"
-        placeholder="Recipient account email"
-        required
-      >
-
-
-      <select
-        id="freeTicket"
-        required
-      >
-
-        <option value="">
-          Loading available tickets…
-        </option>
-
-      </select>
-
-
-      <button
-        type="submit"
-        class="primary"
-      >
-        Give Away Ticket
-      </button>
-
-
-      <p id="freeMsg"></p>
-
-    </form>
-
-  </section>
-
-
-
-  <!-- =========================
-       EMAIL POLICY
-  ========================== -->
-
-  <section class="admin-card">
-
-    <span class="eyebrow">
-      EMAIL POLICY
-    </span>
-
-    <h2>Ticket Email Rules</h2>
-
-    <p class="small">
-      Admin giveaways are silent.
-      The recipient receives the ticket directly in
-      <strong>My Tickets</strong>.
-    </p>
-
-    <p class="small">
-      No email should be sent when an administrator gives
-      away a ticket.
-    </p>
-
-    <p class="small">
-      Normal customer ticket transfers are different.
-      A transfer email should be sent when a user transfers
-      a ticket to another user.
-    </p>
-
-  </section>
-
-
-
-  <!-- =========================
-       SUPPORT
-  ========================== -->
-
-  <section id="support" class="admin-card">
-
-    <h2>Customer Support</h2>
-
-    <div id="supportList">
-      Loading…
-    </div>
-
-  </section>
-
-</main>
-
-
-<footer>
-
-  © 2026 TicketWAVES ·
-
-  <a href="./support.html">
-    Customer support
-  </a>
-
-</footer>
-
-
-<script src="./config.js"></script>
-<script src="./app.js"></script>
-<script src="./admin.js"></script>
-
+<body class="admin-body">
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <header class="admin-header">
+    <a class="brand" href="./index.html#discover"><span>TICKET</span><b>WAVES</b></a>
+    <div class="admin-title"><span>ADMIN</span><small id="admin-email">Control centre</small></div>
+    <button id="admin-logout" class="ghost-btn">Logout</button>
+  </header>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="#dashboard" data-admin-nav>Overview</a>
+      <a href="#users" data-admin-nav>Users</a>
+      <a href="#suspendedUsers" data-admin-nav>Suspended users</a>
+      <a href="#events" data-admin-nav>Events</a>
+      <a href="#tickets" data-admin-nav>All tickets</a>
+      <a href="#availableTickets" data-admin-nav>Available tickets</a>
+      <a href="#orders" data-admin-nav>All orders</a>
+      <a href="#paidOrders" data-admin-nav>Paid orders</a>
+      <a href="#revenue" data-admin-nav>Revenue</a>
+      <a href="#giveaways" data-admin-nav>Giveaways</a>
+      <a href="#create-event" data-admin-nav>Create event</a>
+      <a href="#create-giveaway" data-admin-nav>Create giveaway</a>
+      <a href="#support" data-admin-nav>Support</a>
+    </aside>
+    <main id="admin-app" class="admin-main">
+      <section data-page="dashboard" class="admin-page"></section>
+      <section data-page="users" class="admin-page"></section>
+      <section data-page="suspendedUsers" class="admin-page"></section>
+      <section data-page="events" class="admin-page"></section>
+      <section data-page="tickets" class="admin-page"></section>
+      <section data-page="availableTickets" class="admin-page"></section>
+      <section data-page="orders" class="admin-page"></section>
+      <section data-page="paidOrders" class="admin-page"></section>
+      <section data-page="revenue" class="admin-page"></section>
+      <section data-page="giveaways" class="admin-page"></section>
+      <section data-page="create-event" class="admin-page"></section>
+      <section data-page="create-giveaway" class="admin-page"></section>
+      <section data-page="support" class="admin-page"></section>
+    </main>
+  </div>
+
+  <script src="./assets/js/config.js"></script>
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/admin.js"></script>
 </body>
 </html>
