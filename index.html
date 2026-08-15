@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>TicketWAVES</title>
+<meta name="ticketwaves-build" content="unified-frontend-2026-08-15-auth-gated-sharing">
+<style>
+:root{--blue:#155eef;--ink:#111827;--muted:#69707d;--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--dark:#0b0d12}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.top{position:sticky;top:0;z-index:50;background:#0b0d12;color:#fff}.nav{max-width:1180px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}.logo{display:flex;align-items:center;gap:9px;font-size:24px;font-weight:950;letter-spacing:-1.5px}.brandMark{display:inline-flex!important;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;background:#111;color:#fff!important;font-size:34px;font-family:Georgia,serif;font-style:italic;font-weight:900;line-height:1;transform:rotate(-7deg);box-shadow:0 0 0 1px #2d3140}.logoWord span{color:#4e8cff}.pill{border:1px solid #343946;background:#171a21;color:#fff;border-radius:999px;padding:9px 15px;font-weight:800}
+.page{display:none;min-height:calc(100vh - 60px);padding-bottom:100px}.page.active{display:block}.wrap{max-width:1180px;margin:auto;padding:0 18px}
+.primary{border:0;background:var(--blue);color:#fff;border-radius:12px;padding:13px 17px;font-weight:850}.secondary{border:0;background:#eaf0ff;color:#2047c7;border-radius:12px;padding:12px 16px;font-weight:800}.ghost{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 15px;font-weight:750}.danger{border:0;background:#e5484d;color:#fff;border-radius:12px;padding:11px 15px;font-weight:750}
+.discoverTop{background:#0b0d12;color:#fff;padding-bottom:18px}.discoverNav{padding:18px 0 12px;display:flex;justify-content:space-between;align-items:center}.countryDot{width:42px;height:42px;border-radius:50%;border:0;background:#fff;font-size:21px}
+.filters{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2b2e35}.filter{padding:15px 10px 10px 0;border-right:1px solid #454954}.filter:last-child{border-right:0;padding-left:18px}.filter small{font-size:11px;font-weight:950;letter-spacing:1.4px}.filter span{display:block;margin-top:6px;font-size:17px;color:#e9ebef}
+.searchBox{margin-top:13px;background:#fff;border-radius:10px;padding:5px;display:flex}.searchBox input{border:0;outline:0;flex:1;min-width:0;padding:12px;font-size:16px}.searchBox button{border-radius:8px}
+.categoryBar{display:flex;gap:10px;overflow:auto;padding:15px 0 2px;scrollbar-width:none}.categoryBar::-webkit-scrollbar{display:none}.categoryBar button{white-space:nowrap;border:1px solid #4b4f59;background:#10131a;color:#fff;border-radius:9px;padding:11px 18px;font-weight:850}.categoryBar button.active{background:#fff;color:#111}
+.hero{padding:18px 0 8px}.heroBanner{position:relative;overflow:hidden;min-height:330px;border-radius:22px;background:linear-gradient(135deg,#11162f,#155eef 55%,#7347d9)}.heroBanner:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-120px;top:-120px;background:rgba(255,255,255,.12)}.heroContent{position:relative;z-index:2;padding:30px 23px;color:#fff;max-width:690px}.heroKicker{font-size:12px;font-weight:950;letter-spacing:2px;opacity:.8}.heroContent h1{font-size:clamp(45px,9vw,78px);line-height:.9;letter-spacing:-4px;margin:13px 0}.heroContent p{font-size:16px;line-height:1.5;max-width:560px;color:#eef3ff}.heroButtons{display:flex;gap:9px;flex-wrap:wrap}.heroButtons .secondary{background:#fff;color:#111}
+.adStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.adCard{min-height:155px;border-radius:19px;padding:18px;color:#fff;position:relative;overflow:hidden}.adCard small{font-weight:950;letter-spacing:1.1px;opacity:.78}.adCard h3{font-size:22px;line-height:1.05;margin:9px 0}.adCard p{font-size:12px;color:#eef2f7;max-width:240px}.adCard button{border:0;border-radius:8px;background:#fff;color:#111;padding:8px 11px;font-weight:850}.ad1{background:linear-gradient(135deg,#10152f,#3151a8)}.ad2{background:linear-gradient(135deg,#7028a8,#e84a8a)}.ad3{background:linear-gradient(135deg,#087f5b,#18a878)}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin:27px 0 13px}.sectionTitle h2{font-size:28px;letter-spacing:-1.3px;margin:0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 7px 22px rgba(17,24,70,.06)}.cardImg{width:100%;height:190px;object-fit:cover;background:linear-gradient(135deg,#171d48,#6470ff)}.cardBody{padding:15px}.cardBody h3{font-size:20px;margin:7px 0 5px}.cardBody p{margin:7px 0}.cardBody .primary{width:100%;margin-top:8px}.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:#eef2ff;color:#3150ca;font-size:11px;font-weight:900}.muted{color:var(--muted)}.empty{background:#fff;border:2px dashed #dedfe7;border-radius:18px;padding:40px;text-align:center;color:var(--muted)}
+.myTicketCard{background:#fff;border-radius:18px;overflow:hidden;margin:0 0 18px;box-shadow:0 4px 18px rgba(17,24,70,.08);border:1px solid #e5e7eb}
+.myTicketCard .myTicketImage{width:100%;height:250px;object-fit:cover;display:block;background:#171d48}
+.myTicketCard .myTicketBody{padding:20px 18px 18px}
+.myTicketCard .myTicketDate{font-size:13px;font-weight:900;letter-spacing:.4px;text-transform:uppercase;color:#111827;margin-bottom:10px}
+.myTicketCard .myTicketTitle{font-size:25px;line-height:1.08;margin:0 0 12px;letter-spacing:-.7px}
+.myTicketCard .myTicketVenue{font-size:15px;color:#555b67;margin-bottom:15px}
+.myTicketCard .myTicketMeta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.myTicketCard .myTicketQuantity{font-weight:900;font-size:16px}
+.myTicketCard .viewTicketBtn{width:100%;margin-top:16px;border-radius:0;padding:16px;font-size:17px;font-weight:950}
+.myTicketCard .myTicketSeat{background:#f0f0f0;border-radius:10px;padding:12px;margin-top:12px;font-size:14px;color:#333}
+@media(max-width:700px){
+  .myTicketCard .myTicketImage{height:230px}
+  .myTicketCard .myTicketTitle{font-size:24px}
+}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin:18px 0}.form{display:grid;gap:12px}.form input,.form select,.form textarea{width:100%;padding:14px;border:1px solid #dfe1e8;border-radius:12px;background:#fff;outline:0}.form label{font-size:14px;font-weight:800}.countryField{display:flex;gap:8px}.countryField button{flex:1;text-align:left;background:#fff;border:1px solid #dfe1e8;border-radius:12px;padding:14px}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.98);backdrop-filter:blur(15px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:7px 4px calc(7px + env(safe-area-inset-bottom))}.bottom button{border:0;background:transparent;color:#777b88;font-size:11px;padding:5px 2px}.bottom button b{display:block;font-size:22px;line-height:24px}.bottom button.active{color:var(--blue);font-weight:900}
+.profileHead{background:#10152f;color:#fff;border-radius:22px;padding:24px;margin:18px 0}.row{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;display:flex;justify-content:space-between;gap:14px;align-items:center}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.countryPicker{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:150;display:none;align-items:flex-end}.countryPicker.show{display:flex}.countryPickerCard{background:#fff;width:min(650px,100%);max-height:84vh;overflow:auto;border-radius:26px 26px 0 0;padding:20px}.countryHead{display:flex;justify-content:space-between;align-items:center}.countryHead h3{margin:0}.countrySearch{width:100%;padding:13px;border:1px solid #ddd;border-radius:12px;margin:12px 0}.countryList{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.countryOption{border:1px solid #e2e4ea;background:#fff;border-radius:12px;padding:12px;text-align:left;font-weight:750}.countryOption.selected{background:#eaf0ff;border-color:#155eef;color:#155eef}
+.ticketPreview{background:#202124;color:#fff;border-radius:0;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.15)}.ticketHeroImg{width:100%;height:300px;object-fit:cover;display:block}.ticketInfo{padding:22px 28px}.ticketInfo h1{font-size:35px;line-height:1.08;margin:12px 0}.ticketMeta{font-size:17px;color:#eee}.ticketActions{background:#155eef;color:#fff;text-align:center;padding:17px;font-size:18px;font-weight:900;border:0;width:100%}.ticketTabs{display:grid;grid-template-columns:1fr 1fr;background:#fff;color:#111}.ticketTabs button{border:0;background:#fff;padding:20px;font-weight:800;border-bottom:4px solid #111}.ticketTabs button:last-child{border-bottom-color:#777}.ticketSection{background:#fff;color:#111;padding:25px 18px}.orderLine{display:flex;justify-content:space-between;align-items:center}.ticketFacts{display:grid;grid-template-columns:repeat(3,1fr);background:#eee;margin:15px 0}.ticketFact{padding:15px}.ticketFact small{display:block;color:#666;font-weight:800}.ticketFact strong{font-size:23px}.qrBox{background:#fff;border-radius:0;padding:22px 18px;text-align:center;margin-top:20px;border-top:1px solid #e5e7eb}.qrBox img{width:min(280px,80vw);height:auto}.shareBar{background:#eee;color:#111;padding:18px;text-align:center;font-weight:850;border:0;width:100%}.moreMap{margin-top:20px;background:#eaf0ff;border-radius:15px;padding:18px}.floatingTicketActions{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;position:sticky;bottom:0;border-top:1px solid #ddd;z-index:5}.floatingTicketActions button{border:0;background:#fff;padding:17px 5px}.floatingTicketActions button:nth-child(2){color:#155eef;font-weight:900}
+.adminTop{background:#10152f;color:#fff}.adminNav{max-width:1200px;margin:auto;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}.adminMenu{display:flex;gap:8px;overflow:auto;padding:10px 0 15px}.adminMenu button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px}.adminSection{display:none}.adminSection.active{display:block}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.stat{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px}.stat small{color:var(--muted);font-weight:700}.stat strong{display:block;font-size:28px;margin-top:6px}
+.toast{position:fixed;top:75px;left:50%;transform:translateX(-50%);z-index:300;background:#10152f;color:#fff;border-radius:13px;padding:12px 18px;display:none;max-width:90%;text-align:center}.toast.show{display:block}
+@media(max-width:700px){.adStrip{grid-template-columns:1fr}.adCard{min-height:130px}.grid{grid-template-columns:1fr}.ticketHeroImg{height:260px}.ticketInfo h1{font-size:31px}.ticketFacts{grid-template-columns:1fr 1fr}.ticketFact:last-child{grid-column:1/-1}}
+@media(min-width:800px){.bottom{display:none}.countryPicker{align-items:center}.countryPickerCard{border-radius:25px}}
+.ticketwavesSplash{position:fixed;inset:0;background:#111;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .25s ease}.ticketwavesSplash.hide{opacity:0;pointer-events:none}.splashMark{font-family:Georgia,serif;font-style:italic;font-size:118px;font-weight:900;color:#fff;line-height:1;transform:rotate(-7deg)}
+.myEventsShell{background:#111;color:#fff;margin:0 -18px;padding:18px 18px 0}.myEventsHead{display:flex;justify-content:space-between;align-items:center;padding:4px 0 18px}.myEventsHead h1{font-size:23px;margin:0}.helpLink{color:#fff;font-weight:800}.eventTabs{display:grid;grid-template-columns:1fr 1fr}.eventTabs button{border:0;background:transparent;color:#bbb;padding:14px 5px 13px;font-weight:800;font-size:14px;border-bottom:4px solid transparent}.eventTabs button.active{color:#fff;border-bottom-color:#fff}.myEventCard{background:#242424;color:#fff;margin:12px 0 24px;border-radius:0;overflow:hidden;cursor:pointer}.myEventCard img{width:100%;height:285px;object-fit:cover;display:block}.myEventCardInfo{padding:0 22px 25px}.myEventDate{display:inline-block;background:#242424;padding:13px 0 9px;font-size:13px;font-weight:950;letter-spacing:.4px}.myEventTitle{font-size:29px;line-height:1.05;margin:8px 0 18px;letter-spacing:-1px}.myEventVenue{font-size:16px;color:#eee}.myEventHint{margin-top:18px;color:#9dbbff;font-weight:800;font-size:13px}
+.fullTicket{background:#f4f4f4;min-height:100vh}.fullTicketHeader{background:#111;color:#fff;padding:12px 16px 10px;display:flex;align-items:center;gap:10px}.fullTicketHeader .back{border:0;background:transparent;color:#fff;font-size:27px}.fullTicketHeader .ticketHeadText{flex:1;min-width:0}.fullTicketHeader .ticketHeadText strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fullTicketHeader .ticketHeadText small{display:block;color:#c9c9c9;margin-top:4px}.securityTicket{background:#fff;margin:0 auto;max-width:600px;box-shadow:0 4px 18px rgba(0,0,0,.08);overflow:hidden}.securityBlue{height:31px;background:#3b91ed;color:#063c75;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;font-style:italic}.securityMessage{background:#fff;text-align:center;padding:14px 10px 6px;color:#444;font-size:14px;font-weight:650}.securityQrWrap{padding:0 20px 16px;background:#fff}.securityQr{border:1px solid #ddd;background:#fff;min-height:178px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}.securityQr img{width:190px;height:190px;object-fit:contain;display:block}.securityQr:before,.securityQr:after{content:"";position:absolute;top:25px;bottom:25px;width:8px;background:repeating-linear-gradient(to bottom,#222 0 5px,#fff 5px 8px)}.securityQr:before{left:12px}.securityQr:after{right:12px}.securityShine{position:absolute;top:0;bottom:0;width:28px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-240px);animation:qrshine 3.5s linear infinite}.ticketEventImage{width:100%;max-height:330px;object-fit:cover;display:block}.ticketInfoBlock{background:#fff;padding:18px}.ticketInfoBlock h2{font-size:17px;margin:0 0 4px}.ticketInfoBlock p{margin:0;color:#666}.seatBlock{background:#fff;border-top:1px solid #eee;padding:15px 18px 18px}.seatBlock .seatLabel{font-weight:900;font-size:15px}.seatGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.seatCell{padding:8px 4px}.seatCell small{display:block;color:#777;font-size:11px;font-weight:900}.seatCell strong{display:block;font-size:20px;margin-top:4px}.venueBlue{margin:0 18px 18px;background:#3b91ed;color:#083e76;text-align:center;padding:13px;font-weight:950}.fullTicketExtras{padding:18px;background:#f1f1f1}.shareTicketButton{width:100%;border:0;background:#e9e9e9;padding:18px;font-weight:900;font-size:16px}.ticketBottomActions{display:grid;grid-template-columns:repeat(3,1fr);position:sticky;bottom:0;background:#fff;border-top:1px solid #ddd}.ticketBottomActions button{border:0;background:#fff;padding:15px 4px;font-size:14px}.ticketBottomActions button:nth-child(2){color:#155eef;font-weight:950}@keyframes qrshine{to{transform:translateX(240px)}}
+</style>
+</head>
+<body><div id="ticketwavesSplash" class="ticketwavesSplash"><div class="splashMark">t</div></div>
+<div id="toast" class="toast"></div>
+<header class="top"><div class="nav"><div class="logo"><span class="brandMark">t</span><span class="logoWord">TICKET<span>WAVES</span></span></div><button id="topAccount" class="pill" onclick="showPage(token?'account':'login')">Account</button></div></header>
+<main>
+<section id="discover" class="page active">
+<div class="discoverTop"><div class="wrap">
+<div class="discoverNav"><div class="logo"><span class="brandMark">t</span><span class="logoWord">TICKET<span>WAVES</span></span></div><button class="countryDot" onclick="openCountryPicker()" id="countryButton">🌍</button></div>
+<div class="filters"><div class="filter" onclick="openCountryPicker()"><small>COUNTRY</small><span id="countryDisplay">🌍 All countries</span></div><div class="filter"><small>DATES</small><span>▣ All Dates</span></div></div>
+<div class="searchBox"><input id="searchInput" placeholder="Artist, Event or Venue" onkeydown="if(event.key==='Enter')loadEvents()"><button class="primary" onclick="loadEvents()">⌕</button></div>
+<div class="categoryBar"><button class="active" onclick="loadEvents()">All</button><button onclick="loadCategory('Concert')">Concerts</button><button onclick="loadCategory('Sports')">Sports</button><button onclick="loadCategory('Theatre')">Arts & Theatre</button><button onclick="loadCategory('Comedy')">Comedy</button><button onclick="loadCategory('Festival')">Festivals</button></div>
+</div></div>
+<div class="wrap">
+<div class="hero"><div class="heroBanner"><div class="heroContent"><div class="heroKicker">TICKETWAVES SPOTLIGHT</div><h1>Live starts here.</h1><p>Discover events anywhere in the world. Your selected country personalizes the experience, but every uploaded event remains visible to everyone.</p><div class="heroButtons"><button class="primary" onclick="loadEvents()">Find Tickets</button><button class="secondary" onclick="showPage('register')">Join TicketWAVES</button></div></div></div></div>
+<div class="adStrip"><div class="adCard ad1"><small>WEEKEND PICKS</small><h3>Big nights. Better seats.</h3><p>Explore new events and ticket drops.</p><button onclick="loadEvents()">Browse now</button></div><div class="adCard ad2"><small>TICKETWAVES EXCLUSIVE</small><h3>Don't miss your next show.</h3><p>Keep your tickets and transfers together.</p><button onclick="showPage(token?'tickets':'register')">Get started</button></div><div class="adCard ad3"><small>GLOBAL EVENTS</small><h3>From your city to anywhere.</h3><p>Tickets uploaded in one country can be discovered worldwide.</p><button onclick="openCountryPicker()">Choose country</button></div></div>
+<div class="sectionTitle"><h2>Popular right now</h2><button class="ghost" onclick="loadEvents()">Refresh</button></div><div id="eventGrid" class="grid"><div class="empty">Loading events...</div></div>
+<div class="sectionTitle"><h2>Browse by category</h2></div><div class="categoryBar" style="color:#111;overflow:auto"><button style="color:#111;background:#fff;border-color:#ddd" onclick="loadCategory('Concert')">🎵 Concerts</button><button style="color:#111;background:#fff;border-color:#ddd" onclick="loadCategory('Sports')">⚽ Sports</button><button style="color:#111;background:#fff;border-color:#ddd" onclick="loadCategory('Theatre')">🎭 Theatre</button><button style="color:#111;background:#fff;border-color:#ddd" onclick="loadCategory('Comedy')">😂 Comedy</button></div>
+</div></section>
+
+<section id="eventDetails" class="page"><div class="wrap" id="eventDetailsBox"></div></section>
+<section id="checkout" class="page"><div class="wrap" id="checkoutBox"></div></section>
+<section id="tickets" class="page"><div class="wrap" style="padding-top:0"><div class="myEventsShell"><div class="myEventsHead"><h1>My Events <span id="myEventsCountry">🌍</span></h1><button class="helpLink" onclick="toast('Need help? Contact TicketWAVES support.')">Help</button></div><div class="eventTabs"><button id="upcomingTab" class="active" onclick="setTicketTab('upcoming')">UPCOMING (<span id="upcomingCount">0</span>)</button><button id="pastTab" onclick="setTicketTab('past')">PAST (<span id="pastCount">0</span>)</button></div></div><div id="ticketsBox" style="padding-top:0"><div class="empty">Loading your tickets...</div></div></div></section>
+<section id="ticketView" class="page"><div class="wrap" id="ticketViewBox"></div></section>
+<section id="foryou" class="page"><div class="wrap"><div class="sectionTitle"><h2>For You</h2></div><div id="forYouGrid" class="grid"></div></div></section>
+<section id="sell" class="page"><div class="wrap"><div class="panel"><h2>Sell Tickets</h2><p class="muted">Resale tools can be connected to your ticket inventory later. Your owned tickets, transfers and orders are already managed here.</p></div></div></section>
+<section id="authChoice" class="page">
+<div class="wrap">
+  <div class="panel" style="max-width:520px;margin:45px auto;text-align:center">
+    <div style="font-size:48px;margin-bottom:10px">🎟️</div>
+    <h1 style="margin-bottom:8px">Welcome to TICKETWAVES</h1>
+    <p class="muted">Sign in or create an account to view this ticket and continue.</p>
+    <div style="display:grid;gap:10px;margin-top:24px">
+      <button class="primary" onclick="openLoginFromChoice()">Login</button>
+      <button class="secondary" onclick="openRegisterFromChoice()">Create account</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="login" class="page"><div class="wrap"><div class="panel"><h2>Sign in</h2><form class="form" onsubmit="login(event)"><input id="loginEmail" type="email" placeholder="Email" required><input id="loginPassword" type="password" placeholder="Password" required><button class="primary" type="submit">Sign in</button></form><button class="ghost" style="margin-top:10px" onclick="forgotPassword()">Forgot password?</button><p class="muted">Don't have an account?</p><button class="secondary" onclick="showPage('register')">Create account</button></div></div></section>
+<section id="register" class="page"><div class="wrap"><div class="panel"><h2>Create your TicketWAVES account</h2><p class="muted">Registration starts with your personal details so transfers and emails work correctly.</p><form class="form" onsubmit="registerUser(event)"><label>First name<input id="registerFirst" required placeholder="First name"></label><label>Surname<input id="registerSurname" required placeholder="Surname"></label><label>Phone number<input id="registerPhone" required placeholder="+234..."></label><label>Country<div class="countryField"><button type="button" onclick="openCountryPicker('register')"><span id="registerCountryText">🌍 Select country</span></button></div></label><label>Email<input id="registerEmail" type="email" required placeholder="you@example.com"></label><label>Password<input id="registerPassword" type="password" minlength="6" required placeholder="At least 6 characters"></label><button class="primary">Create account</button></form></div></div></section>
+<section id="account" class="page"><div class="wrap" id="accountBox"></div></section>
+<section id="admin" class="page"><div class="adminTop"><div class="adminNav"><strong>TicketWAVES Admin</strong><button class="danger" onclick="logout()">Logout</button></div></div><div class="wrap"><div class="adminMenu"><button onclick="adminPage('dashboard')">Dashboard</button><button onclick="adminPage('users')">Users</button><button onclick="adminPage('events')">Events</button><button onclick="adminPage('tickets')">Tickets</button><button onclick="adminPage('orders')">Orders</button><button onclick="adminPage('giveaways')">Giveaways</button><button onclick="adminPage('suspended')">Suspended</button><button onclick="adminPage('createGiveaway')">Create Giveaway</button><button onclick="adminPage('createEvent')">Create Event</button><button onclick="adminPage('createTicket')">Create Ticket</button></div>
+<div id="adminDashboard" class="adminSection active"><h2>Dashboard</h2><div id="stats" class="stats"></div></div>
+<div id="adminUsers" class="adminSection"><h2>Users</h2><div id="usersList"></div></div>
+<div id="adminEvents" class="adminSection"><h2>Events</h2><div id="adminEventsList"></div></div>
+<div id="adminTickets" class="adminSection"><h2>Tickets</h2><div id="adminTicketsList"></div></div>
+<div id="adminOrders" class="adminSection"><h2>Orders</h2><div id="adminOrdersList"></div></div>
+<div id="adminGiveaways" class="adminSection"><h2>Giveaways</h2><div id="adminGiveawaysList"></div></div><div id="adminSuspended" class="adminSection"><h2>Suspended Users</h2><div id="suspendedList"></div></div>
+<div id="adminCreateGiveaway" class="adminSection"><div class="panel"><h2>Create Giveaway / Send Ticket</h2><p class="muted">This is separate from Create Event. Enter the recipient email and ticket/event information.</p><form class="form" onsubmit="createGiveaway(event)"><input id="gRecipient" type="email" placeholder="Recipient email" required><input id="gTitle" placeholder="Event title" required><input id="gArtist" placeholder="Artist"><input id="gDate" type="date" required><input id="gTime" type="time" required><input id="gVenue" placeholder="Venue" required><input id="gCity" placeholder="City"><input id="gCountry" placeholder="Country"><input id="gSection" placeholder="Section"><input id="gRow" placeholder="Row"><input id="gSeat" placeholder="Seat"><input id="gQuantity" type="number" min="1" value="1"><input id="gPrice" type="number" min="0" step="0.01" value="0"><select id="gCurrency"></select><textarea id="gInfo" placeholder="Additional ticket information"></textarea><input id="gImage" type="file" accept="image/*"><button class="primary">Send Giveaway Ticket</button></form></div></div><div id="adminCreateEvent" class="adminSection"><div class="panel"><h2>Create Event</h2><form class="form" onsubmit="createEvent(event)"><input id="aTitle" placeholder="Event title" required><input id="aArtist" placeholder="Artist"><select id="aCategory"><option>Concert</option><option>Sports</option><option>Theatre</option><option>Comedy</option><option>Festival</option><option>Conference</option></select><input id="aDate" type="date" required><input id="aTime" type="time" required><input id="aVenue" placeholder="Venue" required><input id="aCity" placeholder="City"><input id="aCountry" placeholder="Country"><select id="aCurrency"></select><textarea id="aDescription" placeholder="Event information"></textarea><input id="aImage" type="file" accept="image/*"><button class="primary">Create Event</button></form></div></div>
+<div id="adminCreateTicket" class="adminSection"><div class="panel"><h2>Create Ticket</h2><form class="form" onsubmit="createTicket(event)"><select id="aTicketEvent" required></select><input id="aSection" placeholder="Section"><input id="aRow" placeholder="Row"><input id="aSeat" placeholder="Seat"><input id="aQuantity" type="number" min="1" value="1"><input id="aPrice" type="number" min="0" step="0.01" placeholder="Price"><select id="aTicketCurrency"></select><textarea id="aTicketInfo" placeholder="Additional ticket information"></textarea><label>Ticket image from gallery<input id="aTicketImage" type="file" accept="image/*"></label><button class="primary">Create Ticket</button></form></div></div>
+</div></section>
+</main>
+<nav class="bottom"><button onclick="showPage('discover')" id="navDiscover"><b>⌕</b>Discover</button><button onclick="showPage('foryou')" id="navForyou"><b>♡</b>For You</button><button onclick="showPage(token?'tickets':'login')" id="navTickets"><b>🎟</b>My Tickets</button><button onclick="showPage('sell')" id="navSell"><b>◉</b>Sell</button><button onclick="showPage('account')" id="navAccount"><b>●</b>Account</button></nav>
+
+<div id="countryPicker" class="countryPicker" onclick="if(event.target===this)closeCountryPicker()"><div class="countryPickerCard"><div class="countryHead"><h3>Choose your country</h3><button class="ghost" onclick="closeCountryPicker()">Close</button></div><input class="countrySearch" id="countrySearch" placeholder="Search country..." oninput="renderCountries(this.value)"><div class="countryList" id="countryList"></div></div></div>
+
+<script>
+const API_BASE="https://ticketwaves-backend-3.onrender.com/api";
+let token=localStorage.getItem("ticketwaves_token")||localStorage.getItem("token")||"", currentUser=null, currentTicket=null, selectedTicketId="", registerMode=false;
+let selectedCountry=localStorage.getItem("ticketwaves_country")||"";
+const countries=[["Afghanistan","🇦🇫"],["Albania","🇦🇱"],["Algeria","🇩🇿"],["Andorra","🇦🇩"],["Angola","🇦🇴"],["Argentina","🇦🇷"],["Armenia","🇦🇲"],["Australia","🇦🇺"],["Austria","🇦🇹"],["Azerbaijan","🇦🇿"],["Bahamas","🇧🇸"],["Bahrain","🇧🇭"],["Bangladesh","🇧🇩"],["Barbados","🇧🇧"],["Belgium","🇧🇪"],["Benin","🇧🇯"],["Bolivia","🇧🇴"],["Bosnia and Herzegovina","🇧🇦"],["Botswana","🇧🇼"],["Brazil","🇧🇷"],["Bulgaria","🇧🇬"],["Burkina Faso","🇧🇫"],["Cameroon","🇨🇲"],["Canada","🇨🇦"],["Chad","🇹🇩"],["Chile","🇨🇱"],["China","🇨🇳"],["Colombia","🇨🇴"],["Costa Rica","🇨🇷"],["Croatia","🇭🇷"],["Cyprus","🇨🇾"],["Czech Republic","🇨🇿"],["Denmark","🇩🇰"],["Dominican Republic","🇩🇴"],["Ecuador","🇪🇨"],["Egypt","🇪🇬"],["Estonia","🇪🇪"],["Ethiopia","🇪🇹"],["Fiji","🇫🇯"],["Finland","🇫🇮"],["France","🇫🇷"],["Gabon","🇬🇦"],["Georgia","🇬🇪"],["Germany","🇩🇪"],["Ghana","🇬🇭"],["Greece","🇬🇷"],["Guatemala","🇬🇹"],["Haiti","🇭🇹"],["Honduras","🇭🇳"],["Hong Kong","🇭🇰"],["Hungary","🇭🇺"],["Iceland","🇮🇸"],["India","🇮🇳"],["Indonesia","🇮🇩"],["Ireland","🇮🇪"],["Israel","🇮🇱"],["Italy","🇮🇹"],["Jamaica","🇯🇲"],["Japan","🇯🇵"],["Jordan","🇯🇴"],["Kazakhstan","🇰🇿"],["Kenya","🇰🇪"],["Kuwait","🇰🇼"],["Latvia","🇱🇻"],["Lebanon","🇱🇧"],["Lithuania","🇱🇹"],["Luxembourg","🇱🇺"],["Madagascar","🇲🇬"],["Malaysia","🇲🇾"],["Malta","🇲🇹"],["Mexico","🇲🇽"],["Monaco","🇲🇨"],["Morocco","🇲🇦"],["Namibia","🇳🇦"],["Nepal","🇳🇵"],["Netherlands","🇳🇱"],["New Zealand","🇳🇿"],["Nigeria","🇳🇬"],["Norway","🇳🇴"],["Oman","🇴🇲"],["Pakistan","🇵🇰"],["Panama","🇵🇦"],["Peru","🇵🇪"],["Philippines","🇵🇭"],["Poland","🇵🇱"],["Portugal","🇵🇹"],["Qatar","🇶🇦"],["Romania","🇷🇴"],["Rwanda","🇷🇼"],["Saudi Arabia","🇸🇦"],["Senegal","🇸🇳"],["Serbia","🇷🇸"],["Singapore","🇸🇬"],["Slovakia","🇸🇰"],["Slovenia","🇸🇮"],["South Africa","🇿🇦"],["South Korea","🇰🇷"],["Spain","🇪🇸"],["Sri Lanka","🇱🇰"],["Sweden","🇸🇪"],["Switzerland","🇨🇭"],["Taiwan","🇹🇼"],["Tanzania","🇹🇿"],["Thailand","🇹🇭"],["Tunisia","🇹🇳"],["Turkey","🇹🇷"],["Uganda","🇺🇬"],["Ukraine","🇺🇦"],["United Arab Emirates","🇦🇪"],["United Kingdom","🇬🇧"],["United States","🇺🇸"],["Uruguay","🇺🇾"],["Venezuela","🇻🇪"],["Vietnam","🇻🇳"],["Zambia","🇿🇲"],["Zimbabwe","🇿🇼"]];
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function toast(x){$("toast").textContent=x;$("toast").classList.add("show");clearTimeout(window._t);window._t=setTimeout(()=>$("toast").classList.remove("show"),3000);}
+function headers(){const h={"Content-Type":"application/json"};if(token)h.Authorization="Bearer "+token;return h;}
+async function api(path,opt={}){
+  let r;
+  try{
+    r=await fetch(API_BASE+path,{
+      ...opt,
+      headers:{...headers(),...(opt.headers||{})}
+    });
+  }catch(err){
+    throw new Error("TicketWAVES server could not be reached. Please try again.");
+  }
+
+  const txt=await r.text();
+  let d={};
+  try{d=txt?JSON.parse(txt):{}}
+  catch{d={message:txt}}
+
+  if(r.status===401){
+    token="";
+    currentUser=null;
+    localStorage.removeItem("ticketwaves_token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
+
+  if(!r.ok) throw new Error(d.message||"Request failed");
+  return d;
+}
+let pendingShareToken=new URLSearchParams(location.search).get("share")||"";
+
+function openLoginFromChoice(){
+  showPage("login");
+  setTimeout(()=>$("loginEmail")?.focus(),50);
+}
+
+function openRegisterFromChoice(){
+  showPage("register");
+  setTimeout(()=>$("registerFirst")?.focus(),50);
+}
+
+function handleSharedTicket(){
+  const share=new URLSearchParams(location.search).get("share");
+  if(!share)return false;
+
+  pendingShareToken=share;
+
+  // A shared ticket always starts at the authentication choice
+  // when the visitor is not already signed in.
+  if(!token){
+    showPage("authChoice");
+    return true;
+  }
+
+  // If already signed in, try to open the shared ticket.
+  openSharedTicket(share);
+  return true;
+}
+
+async function openSharedTicket(share){
+  try{
+    const t=await api("/tickets/public/"+encodeURIComponent(share));
+    currentTicket=t.ticket||t.data||t;
+    renderTicket(currentTicket);
+    showPage("ticketView");
+  }catch(e){
+    toast(e.message||"This ticket link is unavailable.");
+    showPage("login");
+  }
+}
+
+function showPage(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(id)?.classList.add("active");document.querySelectorAll(".bottom button").forEach(x=>x.classList.remove("active"));({discover:"navDiscover",foryou:"navForyou",tickets:"navTickets",sell:"navSell",account:"navAccount"}[id]&&$(({discover:"navDiscover",foryou:"navForyou",tickets:"navTickets",sell:"navSell",account:"navAccount"}[id]))?.classList.add("active"));scrollTo(0,0);if(id==="discover")loadEvents();if(id==="tickets")loadTickets();if(id==="account")loadAccount();if(id==="foryou")loadForYou();}
+function openCountryPicker(mode){registerMode=mode==="register";$("countryPicker").classList.add("show");renderCountries("");}
+function closeCountryPicker(){$("countryPicker").classList.remove("show");registerMode=false;}
+function renderCountries(q){q=(q||"").toLowerCase();$("countryList").innerHTML=countries.filter(c=>c[0].toLowerCase().includes(q)).map(c=>`<button class="countryOption ${c[0]===selectedCountry?"selected":""}" onclick="selectCountry('${c[0].replace(/'/g,"\\'")}')">${c[1]} ${c[0]} ${c[0]===selectedCountry?"✓":""}</button>`).join("")||'<div class="empty">No country found.</div>';}
+function selectCountry(c){selectedCountry=c;localStorage.setItem("ticketwaves_country",c);$("countryDisplay").textContent=(countries.find(x=>x[0]===c)?.[1]||"🌍")+" "+c;$("countryButton").textContent=countries.find(x=>x[0]===c)?.[1]||"🌍";if($("registerCountryText"))$("registerCountryText").textContent=(countries.find(x=>x[0]===c)?.[1]||"🌍")+" "+c;closeCountryPicker();}
+function renderEvents(events,box){if(!events.length){box.innerHTML='<div class="empty">No events yet.</div>';return}box.innerHTML=events.map(e=>`<article class="card">${e.image?`<img class="cardImg" src="${esc(e.image)}">`:`<div class="cardImg"></div>`}<div class="cardBody"><span class="tag">${esc(e.category||"Event")}</span><h3>${esc(e.title)}</h3><div class="muted">${esc(e.artist||"Live event")}</div><p>${esc(e.date)} · ${esc(e.time)}</p><p>${esc(e.venue)}${e.city?" · "+esc(e.city):""}</p><button class="primary" onclick="openEvent('${e._id}')">View Tickets</button></div></article>`).join("");}
+async function loadEvents(){const box=$("eventGrid");box.innerHTML='<div class="empty">Loading events...</div>';try{const q=$("searchInput").value.trim();const data=await api("/events"+(q?"?search="+encodeURIComponent(q):""));renderEvents(data,box);}catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';}}
+async function loadCategory(c){showPage("discover");try{const data=await api("/events?category="+encodeURIComponent(c));renderEvents(data,$("eventGrid"));}catch(e){toast(e.message);}}
+async function openEvent(id){try{const e=await api("/events/"+id);const seats=await api("/events/"+id+"/seats");$("eventDetailsBox").innerHTML=`<button class="ghost" onclick="showPage('discover')">← Back</button><div class="panel">${e.image?`<img class="cardImg" style="height:300px;border-radius:15px" src="${esc(e.image)}">`:""}<h1>${esc(e.title)}</h1><p>${esc(e.date)} · ${esc(e.time)}</p><p>${esc(e.venue)}${e.city?", "+esc(e.city):""}</p><p class="muted">${esc(e.description||"")}</p><h2>Select a ticket</h2><div class="list">${seats.length?seats.map(t=>`<div class="row"><div><strong>${esc(t.section||"General")} · Row ${esc(t.row||"-")} · Seat ${esc(t.seat||"-")}</strong><div>${esc(t.currencySymbol||"")} ${Number(t.price||0).toLocaleString()} ${esc(t.currency||"")}</div></div><button class="primary" onclick="checkout('${t._id}')">Buy</button></div>`).join(""):'<div class="empty">No tickets available.</div>'}</div></div>`;showPage("eventDetails");}catch(e){toast(e.message);}}
+async function checkout(ticketId){if(!token){toast("Create an account or sign in before buying.");showPage("register");return}selectedTicketId=ticketId;try{const d=await api("/events");let ticket=null,event=null;for(const e of d){const s=await api("/events/"+e._id+"/seats");const found=s.find(x=>x._id===ticketId);if(found){ticket=found;event=e;break;}}if(!ticket||!event)throw new Error("Ticket is no longer available");$("checkoutBox").innerHTML=`<div class="panel"><h2>Checkout</h2><h3>${esc(event.title)}</h3><p>${esc(event.date)} · ${esc(event.time)}</p><p>${esc(event.venue)}${event.city?", "+esc(event.city):""}</p><p><b>${esc(ticket.currencySymbol||"")} ${Number(ticket.price||0).toLocaleString()} ${esc(ticket.currency||"")}</b></p><button class="primary" onclick="pay('${ticket._id}','${event._id}')">Continue to Pay</button></div>`;showPage("checkout");}catch(e){toast(e.message);}}
+async function pay(ticketId,eventId){try{const seats=await api("/events/"+eventId+"/seats");const ticket=seats.find(x=>x._id===ticketId);if(!ticket)throw new Error("Ticket is no longer available");const init=await api("/payment/initialize",{method:"POST",body:JSON.stringify({eventId,ticketId,currency:ticket.currency,email:currentUser?.email})});if(init.free){window.location.href="./index.html";return}window.location.href=init.authorization_url;}catch(e){toast(e.message);}}
+let ticketTab="upcoming";
+function setTicketTab(tab){ticketTab=tab;$("upcomingTab")?.classList.toggle("active",tab==="upcoming");$("pastTab")?.classList.toggle("active",tab==="past");renderMyTicketList(window.__myTickets||[]);}
+function renderMyTicketList(all){
+  const box=$("ticketsBox");
+  const now=Date.now();
+  const upcoming=all.filter(t=>{const d=new Date(`${t.eventId?.date||""}T${t.eventId?.time||"23:59"}`).getTime();return !Number.isFinite(d)||d>=now;});
+  const past=all.filter(t=>!upcoming.includes(t));
+  $("upcomingCount").textContent=upcoming.length;
+  $("pastCount").textContent=past.length;
+  const ts=ticketTab==="upcoming"?upcoming:past;
+  if(!ts.length){box.innerHTML='<div class="empty" style="margin-top:14px">You do not have any '+(ticketTab==="upcoming"?'upcoming':'past')+' tickets yet.</div>';return;}
+  box.innerHTML=ts.map(t=>{
+    const e=t.eventId||{};
+    const dateLine=[e.date,e.time].filter(Boolean).join(" · ");
+    const venueLine=[e.venue,e.city,e.country].filter(Boolean).join(" - ");
+    return `<article class="myEventCard" onclick="viewTicket('${esc(t._id)}')">
+      ${e.image?`<img src="${esc(e.image)}" alt="${esc(e.title||'Event')}" onerror="this.style.display='none'">`:`<div style="height:285px;background:#171717"></div>`}
+      <div class="myEventCardInfo">
+        <div class="myEventDate">${esc(dateLine||"EVENT DATE")}</div>
+        <h2 class="myEventTitle">${esc(e.title||"TicketWAVES Event")}</h2>
+        <div class="myEventVenue">${esc(venueLine||"Venue unavailable")}</div>
+        <div class="myEventHint">Tap to view ticket →</div>
+      </div>
+    </article>`;
+  }).join("");
+}
+async function loadTickets(){
+  const box=$("ticketsBox");
+  if(!token){box.innerHTML='<div class="empty">Sign in to see your tickets.</div>';return;}
+  box.innerHTML='<div class="empty">Loading your tickets...</div>';
+  try{
+    const response=await api("/tickets/me");
+    const ts=Array.isArray(response)?response:(Array.isArray(response?.tickets)?response.tickets:[]);
+    window.__myTickets=ts;
+    renderMyTicketList(ts);
+  }catch(e){box.innerHTML='<div class="empty">'+esc(e.message)+'</div>';}
+}
+async function viewTicket(id){try{const t=await api("/tickets/"+id);currentTicket=t;renderTicket(t);showPage("ticketView");}catch(e){toast(e.message);}}
+function renderTicket(t){
+  const e=t.eventId||{};
+  const map=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([e.venue,e.city,e.country].filter(Boolean).join(', '))}`;
+  const qr=t.qrImage||"";
+  const dateLine=[e.date,e.time].filter(Boolean).join(" · ");
+  const location=[e.venue,e.city,e.country].filter(Boolean).join(" - ");
+  $("ticketViewBox").innerHTML=`
+    <div class="fullTicket">
+      <div class="fullTicketHeader">
+        <button class="back" onclick="showPage('tickets')">‹</button>
+        <div class="ticketHeadText">
+          <strong>${esc(e.title||"TicketWAVES Ticket")}</strong>
+          <small>${esc(dateLine)}${location?" · "+esc(location):""}</small>
+        </div>
+        <button class="helpLink" style="border:0;background:transparent" onclick="toast('Need help? Contact TicketWAVES support.')">Help</button>
+      </div>
+
+      <div class="securityTicket">
+        <div class="securityBlue">ticketwaves</div>
+        <div class="securityMessage">Screenshots won't get you in <span style="font-size:20px">↻</span></div>
+        <div class="securityQrWrap">
+          <div class="securityQr">
+            ${qr?`<img src="${esc(qr)}" alt="Secure Ticket QR Code"><span class="securityShine"></span>`:`<div style="padding:25px;text-align:center;color:#777">QR code unavailable</div>`}
+          </div>
+        </div>
+        ${e.image?`<img class="ticketEventImage" src="${esc(e.image)}" alt="${esc(e.title||'Event')}">`:''}
+        <div class="ticketInfoBlock">
+          <h2>TICKET</h2>
+          <p>Reserved Seat Ticket · ${esc(t.ticketCode||t._id||"")}</p>
+        </div>
+        <div class="seatBlock">
+          <div class="seatLabel">SEAT INFORMATION</div>
+          <div class="seatGrid">
+            <div class="seatCell"><small>SECTION</small><strong>${esc(t.section||"-")}</strong></div>
+            <div class="seatCell"><small>ROW</small><strong>${esc(t.row||"-")}</strong></div>
+            <div class="seatCell"><small>SEAT</small><strong>${esc(t.seat||"-")}</strong></div>
+          </div>
+        </div>
+        <div class="venueBlue">${esc((e.venue||"Venue").toUpperCase())} →</div>
+      </div>
+
+      <div class="fullTicketExtras">
+        <div class="panel" style="margin:0 0 12px">
+          <strong>Order #${esc(t.ticketCode||t._id||"")}</strong>
+          <div class="muted" style="margin-top:5px">x${esc(t.quantity||1)} Ticket · ${esc(t.status||"Confirmed")}</div>
+        </div>
+        <div class="panel" style="margin:0 0 12px">
+          <h3 style="margin-top:0">Venue & Directions</h3>
+          <p>${esc(location||"Location unavailable")}</p>
+          <a class="primary" style="display:block;text-align:center;text-decoration:none;margin-top:12px" href="${map}" target="_blank">Get Directions</a>
+        </div>
+        <button class="shareTicketButton" onclick="shareTicket('${esc(t.shareToken||"")}')">Share You're Going ↗</button>
+      </div>
+
+      <div class="ticketBottomActions">
+        <button onclick="toast('Upgrade is coming soon')">↑<br>Upgrade</button>
+        <button onclick="transferTicket('${esc(t._id)}')">↗<br>Transfer</button>
+        <button onclick="toast('Selling is coming soon')">⟳<br>Sell</button>
+      </div>
+    </div>`;
+}
+async function shareTicket(share){
+  if(!share){
+    toast("This ticket does not have a share link yet.");
+    return;
+  }
+
+  const url=`${location.origin}${location.pathname}?share=${encodeURIComponent(share)}`;
+
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title:"My TicketWAVES Ticket",
+        text:"View my TicketWAVES ticket",
+        url
+      });
+    }else{
+      await navigator.clipboard.writeText(url);
+      toast("Ticket link copied");
+    }
+  }catch(e){}
+}
+async function transferTicket(id){if(!token)return showPage("login");const email=prompt("Recipient email:");if(!email)return;try{const d=await api("/tickets/"+id+"/transfer",{method:"POST",body:JSON.stringify({email})});toast(d.accountExists?"Transfer invitation sent":"Invitation sent — recipient can create an account from the email.");}catch(e){toast(e.message);}}
+async function loadForYou(){try{renderEvents((await api("/events")).slice(0,8),$("forYouGrid"));}catch(e){toast(e.message);}}
+async function loadAccount(){const box=$("accountBox");if(!token){box.innerHTML='<div class="panel"><h2>Account</h2><button class="primary" onclick="showPage(\'login\')">Sign in</button> <button class="secondary" onclick="showPage(\'register\')">Create account</button></div>';return}try{const d=await api("/auth/me");currentUser=d.user;if(currentUser.role==="admin"){box.innerHTML=`<div class="profileHead"><h2>${esc(currentUser.name)}</h2><p>${esc(currentUser.email)}</p><p>Administrator account</p></div><div class="panel"><button class="primary" onclick="showPage('admin');adminPage('dashboard')">Open Admin Dashboard</button></div><div class="panel"><button class="danger" onclick="logout()">Logout</button></div>`;}else{box.innerHTML=`<div class="profileHead"><h2>${esc(currentUser.name)}</h2><p>${esc(currentUser.email)}</p><p>${esc(currentUser.phone)} · ${esc(currentUser.country)}</p></div><div class="panel"><button class="primary" onclick="showPage('tickets')">My Tickets</button></div><div class="panel"><button class="danger" onclick="logout()">Logout</button></div>`;}}catch(e){logout();}}
+async function login(e){
+  e.preventDefault();
+  const email=($("loginEmail")?.value||"").trim().toLowerCase();
+  const password=$("loginPassword")?.value||"";
+  if(!email){toast("Please enter your email.");return;}
+  if(!password){toast("Please enter your password.");return;}
+
+  const btn=e.target?.querySelector('button[type="submit"],button:not([type])');
+  const oldText=btn?.textContent;
+  if(btn){btn.disabled=true;btn.textContent="Signing in...";}
+
+  try{
+    const d=await api("/auth/login",{
+      method:"POST",
+      body:JSON.stringify({email,password})
+    });
+
+    if(!d?.token||!d?.user){
+      throw new Error(d?.message||"The server returned an incomplete login response.");
+    }
+
+    token=d.token;
+    currentUser=d.user;
+
+    localStorage.setItem("ticketwaves_token",d.token);
+    localStorage.setItem("token",d.token);
+    localStorage.setItem("user",JSON.stringify(d.user));
+
+    $("topAccount").textContent=d.user.role==="admin"?"Admin":"Account";
+    toast("Welcome back");
+
+    if(d.user.role==="admin"){
+      showPage("admin");
+      adminPage("dashboard");
+    }else if(pendingShareToken){
+      openSharedTicket(pendingShareToken);
+    }else{
+      showPage("account");
+    }
+  }catch(x){
+    console.error("TicketWAVES login error:",x);
+    toast(x.message||"Unable to login. Please check your email and password.");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=oldText||"Sign in";}
+  }
+}
+async function forgotPassword(){
+  const email=prompt("Enter the email address on your TicketWAVES account:");
+  if(!email)return;
+  try{
+    const d=await api("/auth/forgot-password",{
+      method:"POST",
+      body:JSON.stringify({email:email.trim().toLowerCase()})
+    });
+    toast(d.message||"If the account exists, a reset email has been sent.");
+  }catch(e){
+    toast(e.message||"Unable to start password reset.");
+  }
+}
+async function registerUser(e){e.preventDefault();if(!selectedCountry){toast("Please select your country");openCountryPicker("register");return}try{const d=await api("/auth/register",{method:"POST",body:JSON.stringify({firstName:$("registerFirst").value,surname:$("registerSurname").value,phone:$("registerPhone").value,country:selectedCountry,email:$("registerEmail").value,password:$("registerPassword").value})});token=d.token;localStorage.setItem("ticketwaves_token",token);localStorage.setItem("token",token);localStorage.setItem("user",JSON.stringify(d.user));currentUser=d.user;toast(d.email?.sent?"Account created — welcome email sent!":"Account created. Email setup still needs to be completed.");
+if(pendingShareToken){
+  openSharedTicket(pendingShareToken);
+}else{
+  showPage("account");
+}}catch(x){toast(x.message);}}
+function logout(){token="";currentUser=null;localStorage.removeItem("ticketwaves_token");localStorage.removeItem("token");localStorage.removeItem("user");showPage("discover");}
+async function adminPage(name){if(!token)return showPage("login");try{const d=await api("/auth/me");if(d.user.role!=="admin")throw new Error("Administrator access required");}catch(e){toast(e.message);return}document.querySelectorAll(".adminSection").forEach(x=>x.classList.remove("active"));$("admin"+name.charAt(0).toUpperCase()+name.slice(1))?.classList.add("active");if(name==="dashboard")loadAdminStats();if(name==="users")loadAdminUsers();if(name==="events")loadAdminEvents();if(name==="tickets")loadAdminTickets();if(name==="orders")loadAdminOrders();if(name==="giveaways")loadAdminGiveaways();if(name==="suspended")loadSuspended();if(name==="createGiveaway")loadCurrencies();if(name==="createEvent")loadCurrencies();if(name==="createTicket"){loadTicketEventOptions();loadCurrencies();}}
+async function loadAdminStats(){try{const d=await api("/admin/stats");$("stats").innerHTML=Object.entries(d).map(([k,v])=>`<div class="stat"><small>${esc(k)}</small><strong>${typeof v==="number"?v.toLocaleString():esc(v)}</strong></div>`).join("");}catch(e){toast(e.message);}}
+async function loadAdminUsers(){try{$("usersList").innerHTML=(await api("/admin/users")).map(u=>`<div class="row"><div><b>${esc(u.name)}</b><div>${esc(u.email)}</div><small>${esc(u.role)} · ${u.suspended?"Suspended":"Active"}</small></div><button class="secondary" onclick="suspendUser('${u._id}',${!u.suspended})">${u.suspended?"Restore":"Suspend"}</button></div>`).join("");}catch(e){toast(e.message);}}
+async function suspendUser(id,v){try{await api("/admin/users/"+id+"/suspend",{method:"PUT",body:JSON.stringify({suspended:v})});loadAdminUsers();}catch(e){toast(e.message);}}
+async function loadAdminEvents(){try{$("adminEventsList").innerHTML=(await api("/admin/events")).map(e=>`<div class="row"><div><b>${esc(e.title)}</b><div>${esc(e.date)} · ${esc(e.venue)}</div><small>${esc(e.currency||"NGN")} ${esc(e.currencySymbol||"")}</small></div><button class="danger" onclick="archiveEvent('${e._id}')">Archive</button></div>`).join("");}catch(e){toast(e.message);}}
+async function archiveEvent(id){if(!confirm("Archive this event?"))return;try{await api("/admin/events/"+id,{method:"DELETE"});loadAdminEvents();}catch(e){toast(e.message);}}
+async function loadAdminTickets(){try{$("adminTicketsList").innerHTML=(await api("/admin/tickets")).map(t=>`<div class="row"><div><b>${esc(t.ticketCode)}</b><div>${esc(t.eventId?.title||"")}</div><small>${esc(t.section||"-")} · ${esc(t.row||"-")} · ${esc(t.seat||"-")} · ${esc(t.currency||"NGN")} ${Number(t.price||0).toLocaleString()}</small></div><div class="actions"><button class="secondary" onclick="editTicket('${t._id}')">Edit</button><button class="danger" onclick="deleteTicket('${t._id}')">Delete</button></div></div>`).join("");}catch(e){toast(e.message);}}
+async function editTicket(id){try{const ts=await api("/admin/tickets");const t=ts.find(x=>x._id===id);if(!t)return;const section=prompt("Section",t.section||"");if(section===null)return;const row=prompt("Row",t.row||"");if(row===null)return;const seat=prompt("Seat",t.seat||"");if(seat===null)return;const price=prompt("Price",t.price||0);if(price===null)return;const quantity=prompt("Quantity",t.quantity||1);if(quantity===null)return;const info=prompt("Additional info",t.additionalInfo||"");await api("/admin/tickets/"+id,{method:"PUT",body:JSON.stringify({section,row,seat,price:Number(price),quantity:Number(quantity),additionalInfo:info})});toast("Ticket updated");loadAdminTickets();}catch(e){toast(e.message);}}
+async function loadSuspended(){try{$("suspendedList").innerHTML=(await api("/admin/suspended-users")).map(u=>`<div class="row"><div><b>${esc(u.name)}</b><div>${esc(u.email)}</div></div><button class="secondary" onclick="suspendUser('${u._id}',false)">Restore</button></div>`).join("")||'<div class="empty">No suspended users.</div>';}catch(e){toast(e.message);}}
+async function createGiveaway(e){e.preventDefault();try{const image=await fileData($("gImage"));await api("/admin/giveaways",{method:"POST",body:JSON.stringify({recipientEmail:$("gRecipient").value,eventTitle:$("gTitle").value,artist:$("gArtist").value,date:$("gDate").value,time:$("gTime").value,venue:$("gVenue").value,city:$("gCity").value,country:$("gCountry").value,section:$("gSection").value,row:$("gRow").value,seat:$("gSeat").value,quantity:Number($("gQuantity").value||1),price:Number($("gPrice").value||0),currency:$("gCurrency").value,additionalInfo:$("gInfo").value,image})});toast("Giveaway ticket sent");e.target.reset();adminPage("giveaways");}catch(x){toast(x.message);}}
+async function deleteTicket(id){if(!confirm("Delete this ticket?"))return;try{await api("/admin/tickets/"+id,{method:"DELETE"});loadAdminTickets();}catch(e){toast(e.message);}}
+async function loadAdminOrders(){try{$("adminOrdersList").innerHTML=(await api("/admin/orders")).map(o=>`<div class="row"><div><b>${esc(o.reference)}</b><div>${esc(o.userId?.email||"")}</div></div><div>${esc(o.currency||"")} ${Number(o.amount||0).toLocaleString()}<br>${esc(o.status)}</div></div>`).join("");}catch(e){toast(e.message);}}
+async function loadAdminGiveaways(){try{$("adminGiveawaysList").innerHTML=(await api("/admin/giveaways")).map(g=>`<div class="row"><div><b>${esc(g.eventTitle)}</b><div>${esc(g.recipientId?.email||g.recipientEmail||"")}</div></div></div>`).join("");}catch(e){toast(e.message);}}
+async function loadCurrencies(){try{const cs=await api("/currencies");["aCurrency","aTicketCurrency","gCurrency"].forEach(id=>{if($(id))$(id).innerHTML=cs.map(c=>`<option value="${c.code}">${c.code} — ${c.name} (${c.symbol})</option>`).join("");});}catch(e){toast(e.message);}}
+async function loadTicketEventOptions(){try{$("aTicketEvent").innerHTML=(await api("/admin/events")).filter(e=>!e.archived).map(e=>`<option value="${e._id}">${esc(e.title)}</option>`).join("");}catch(e){toast(e.message);}}
+function fileData(input){return new Promise(resolve=>{const f=input.files?.[0];if(!f)return resolve("");const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve("");r.readAsDataURL(f);});}
+async function createEvent(e){e.preventDefault();try{const image=await fileData($("aImage"));await api("/admin/events",{method:"POST",body:JSON.stringify({title:$("aTitle").value,artist:$("aArtist").value,category:$("aCategory").value,date:$("aDate").value,time:$("aTime").value,venue:$("aVenue").value,city:$("aCity").value,country:$("aCountry").value,currency:$("aCurrency").value,description:$("aDescription").value,image})});toast("Event created");e.target.reset();adminPage("events");}catch(x){toast(x.message);}}
+async function createTicket(e){e.preventDefault();try{const image=await fileData($("aTicketImage"));await api("/admin/tickets",{method:"POST",body:JSON.stringify({eventId:$("aTicketEvent").value,section:$("aSection").value,row:$("aRow").value,seat:$("aSeat").value,quantity:Number($("aQuantity").value||1),price:Number($("aPrice").value||0),currency:$("aTicketCurrency").value,additionalInfo:$("aTicketInfo").value,image})});toast("Ticket created with QR code");e.target.reset();adminPage("tickets");}catch(x){toast(x.message);}}
+async function handlePaymentCallback(){
+  const params=new URLSearchParams(location.search);
+  const reference=params.get("reference")||params.get("trxref")||"";
+
+  if(!reference)return false;
+
+  if(!token){
+    toast("Please sign in again so we can attach your payment to your account.");
+    showPage("login");
+    return true;
+  }
+
+  showPage("tickets");
+  $("ticketsBox").innerHTML='<div class="empty">Confirming your payment and preparing your ticket...</div>';
+
+  try{
+    const result=await api("/payment/verify/"+encodeURIComponent(reference));
+    if(result?.paid || result?.alreadyPaid){
+      toast("Payment confirmed — your ticket is now in My Tickets.");
+      history.replaceState({},document.title,location.pathname);
+      await loadTickets();
+    }else{
+      toast(result?.message||"Payment has not been confirmed yet.");
+      await loadTickets();
+    }
+  }catch(e){
+    toast(e.message||"Unable to confirm payment.");
+    $("ticketsBox").innerHTML='<div class="empty">'+esc(e.message||"Unable to confirm payment.")+'<br><br><button class="primary" onclick="loadTickets()">Refresh</button></div>';
+  }
+
+  return true;
+}
+
+async function boot(){
+  setTimeout(()=>$("ticketwavesSplash")?.classList.add("hide"),450);
+  const params=new URLSearchParams(location.search);
+  const transferToken=params.get("transfer");
+
+  if(params.get("register")==="1"||transferToken)showPage("register");
+
+  if(selectedCountry){
+    const c=countries.find(x=>x[0]===selectedCountry);
+    $("countryDisplay").textContent=(c?.[1]||"🌍")+" "+selectedCountry;
+    $("countryButton").textContent=c?.[1]||"🌍";
+    $("registerCountryText").textContent=(c?.[1]||"🌍")+" "+selectedCountry;
+  }
+
+  if(token){
+    try{
+      const d=await api("/auth/me");
+      currentUser=d.user;
+      $("topAccount").textContent=d.user.role==="admin"?"Admin":"Account";
+    }catch{
+      logout();
+    }
+  }
+
+  // Paystack returns to the callback URL with ?reference=...
+  if(await handlePaymentCallback())return;
+
+  if(handleSharedTicket())return;
+
+  loadEvents();
+}
+boot();
+</script>
+</body></html>
