@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import type { TicketGroup, User, Country, DiscoverSection } from './types';
 import { DiscoverPage } from './pages/DiscoverPage';
 import { ForYouPage } from './pages/ForYouPage';
