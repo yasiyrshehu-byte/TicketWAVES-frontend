@@ -1,1 +1,0 @@
-Upload index.html, style.css, script.js, 404.html and logo-t.png to the repository root. GitHub Pages -> main -> /(root).
